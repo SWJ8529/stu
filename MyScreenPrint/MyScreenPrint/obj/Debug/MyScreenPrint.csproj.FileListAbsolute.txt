@@ -1,0 +1,25 @@
+E:\C#\ScreenCatch-master\ScreenCatch-master\Documents\Visual Studio 2015\Projects\MyScreenPrint\MyScreenPrint\bin\Debug\MyScreenPrint.exe.config
+E:\C#\ScreenCatch-master\ScreenCatch-master\Documents\Visual Studio 2015\Projects\MyScreenPrint\MyScreenPrint\bin\Debug\MyScreenPrint.exe
+E:\C#\ScreenCatch-master\ScreenCatch-master\Documents\Visual Studio 2015\Projects\MyScreenPrint\MyScreenPrint\bin\Debug\MyScreenPrint.pdb
+E:\C#\ScreenCatch-master\ScreenCatch-master\Documents\Visual Studio 2015\Projects\MyScreenPrint\MyScreenPrint\obj\Debug\MyScreenPrint.csprojAssemblyReference.cache
+E:\C#\ScreenCatch-master\ScreenCatch-master\Documents\Visual Studio 2015\Projects\MyScreenPrint\MyScreenPrint\obj\Debug\MyScreenPrint.Cutter.resources
+E:\C#\ScreenCatch-master\ScreenCatch-master\Documents\Visual Studio 2015\Projects\MyScreenPrint\MyScreenPrint\obj\Debug\MyScreenPrint.Form1.resources
+E:\C#\ScreenCatch-master\ScreenCatch-master\Documents\Visual Studio 2015\Projects\MyScreenPrint\MyScreenPrint\obj\Debug\MyScreenPrint.Properties.Resources.resources
+E:\C#\ScreenCatch-master\ScreenCatch-master\Documents\Visual Studio 2015\Projects\MyScreenPrint\MyScreenPrint\obj\Debug\MyScreenPrint.csproj.GenerateResource.cache
+E:\C#\ScreenCatch-master\ScreenCatch-master\Documents\Visual Studio 2015\Projects\MyScreenPrint\MyScreenPrint\obj\Debug\MyScreenPrint.csproj.CoreCompileInputs.cache
+E:\C#\ScreenCatch-master\ScreenCatch-master\Documents\Visual Studio 2015\Projects\MyScreenPrint\MyScreenPrint\obj\Debug\MyScreenPrint.exe
+E:\C#\ScreenCatch-master\ScreenCatch-master\Documents\Visual Studio 2015\Projects\MyScreenPrint\MyScreenPrint\obj\Debug\MyScreenPrint.pdb
+E:\C#\MyScreenPrint\MyScreenPrint\bin\Debug\MyScreenPrint.exe.config
+E:\C#\MyScreenPrint\MyScreenPrint\bin\Debug\MyScreenPrint.exe
+E:\C#\MyScreenPrint\MyScreenPrint\bin\Debug\MyScreenPrint.pdb
+E:\C#\MyScreenPrint\MyScreenPrint\obj\Debug\MyScreenPrint.Cutter.resources
+E:\C#\MyScreenPrint\MyScreenPrint\obj\Debug\MyScreenPrint.Form1.resources
+E:\C#\MyScreenPrint\MyScreenPrint\obj\Debug\MyScreenPrint.Properties.Resources.resources
+E:\C#\MyScreenPrint\MyScreenPrint\obj\Debug\MyScreenPrint.csproj.GenerateResource.cache
+E:\C#\MyScreenPrint\MyScreenPrint\obj\Debug\MyScreenPrint.csproj.CoreCompileInputs.cache
+E:\C#\MyScreenPrint\MyScreenPrint\obj\Debug\MyScreenPrint.exe
+E:\C#\MyScreenPrint\MyScreenPrint\obj\Debug\MyScreenPrint.pdb
+E:\C#\MyScreenPrint\MyScreenPrint\bin\Debug\Newtonsoft.Json.dll
+E:\C#\MyScreenPrint\MyScreenPrint\bin\Debug\Newtonsoft.Json.xml
+E:\C#\MyScreenPrint\MyScreenPrint\obj\Debug\MyScreenPrint.csproj.CopyComplete
+E:\C#\MyScreenPrint\MyScreenPrint\obj\Debug\MyScreenPrint.csprojAssemblyReference.cache
