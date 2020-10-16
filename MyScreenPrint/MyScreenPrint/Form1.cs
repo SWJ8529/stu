@@ -240,13 +240,7 @@ namespace MyScreenPrint
             }
         }
 
-        public void StartTimer()
-        {
-            timer.Elapsed += new System.Timers.ElapsedEventHandler(InvokeFailMsg);
-            timer.Enabled = true;//是否触发Elapsed事件
-            timer.AutoReset = true; //每到指定时间Elapsed事件是触发一次（false），还是一直触发（true）
-            timer.Interval = 5000;// 设置时间间隔为5秒
-        }
+
 
 
     }
