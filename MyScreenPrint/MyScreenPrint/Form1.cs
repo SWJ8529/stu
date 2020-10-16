@@ -9,6 +9,9 @@ using System.Collections.Generic;
 using System.Text;
 using System.Net;
 using System.Drawing.Imaging;
+using System.Net.Http;
+using RestSharp;
+using System.Net.Http.Headers;
 
 namespace MyScreenPrint
 {
@@ -63,7 +66,7 @@ namespace MyScreenPrint
             cutter.ShowDialog();
 
             textBox1.Text = cutter.sb.ToString();
-            label1.Text = Program.point.Count.ToString();
+            label1.Text = "设置坐标个数：" + Program.point.Count;
             // 显示所截得的图片
             //UpdateScreen();
 
@@ -117,29 +120,26 @@ namespace MyScreenPrint
                     g.DrawImage(my, new Rectangle(0, 0, width, height), new Rectangle(rectX, rectY, width, height), GraphicsUnit.Pixel);
 
                     bmp.Save(Environment.GetFolderPath(Environment.SpecialFolder.Desktop) +"\\"+DateTime.Now.ToFileTime().ToString()+".jpg");
-
-                    //stream = BytesToStream(BitmapToBytes(bmp));
                     MemoryStream ms = new MemoryStream();
                     bmp.Save(ms, ImageFormat.Png);
 
-                    byte[] buffur = new byte[ms.Length];
-                    ms.Seek(0, SeekOrigin.Begin); // 此处需要将流重置，不然下面的代码读取不到数据。
-                    ms.Read(buffur, 0, Convert.ToInt32(ms.Length));
-
-
-                    var formDatas = new List<FormItemModel>();
-                    formDatas.Add(new FormItemModel()
-                    {
-                        Key = "file",
-                        Value = "",
-                        FileName = "pic.Png",
-                        FileContent = ms
-                    });
-                    //string Response = PostWebRequest("http://118.25.1.155:9527/ocr","",new Dictionary<string, string>(),"POST",true,data);
-                    string Response= PostForm("http://118.25.1.155:9527/ocr", formDatas);
-                    textBox2.Text = Response;
-                    bmp.Dispose();
-                    ms.Dispose();
+                    //using (var client = new HttpClient())
+                    //using (var content = new MultipartFormDataContent())
+                    //{
+                    //    client.BaseAddress = new Uri("http://118.25.1.155:9527/ocr");
+                    //    var fileContent1 = new ByteArrayContent(File.ReadAllBytes(@"D:/8cb857379572edf39ea92e5d574acb9.png"));
+                    //    fileContent1.Headers.ContentDisposition = new ContentDispositionHeaderValue("form-data")
+                    //    {
+                    //        Name = "\"file\"",
+                    //        FileName = "\"8cb857379572edf39ea92e5d574acb9.png\""
+                    //    };
+                    //    fileContent1.Headers.ContentType = new MediaTypeHeaderValue("image/png");
+                    //    //content.Headers.Add("Content-Tpye","image/png");
+                    //    content.Add(fileContent1);
+                    //    //content.Add(dataContent);
+                    //    var result = client.PostAsync("", content).Result;
+                    //    string str = result.Content.ReadAsStringAsync().Result;
+                    //}
                 }
             }
             else {
@@ -166,273 +166,46 @@ namespace MyScreenPrint
             FileStream fs = new FileStream(Environment.CurrentDirectory + @"/Point.txt", FileMode.Open, FileAccess.Write);
             System.IO.File.SetAttributes(Environment.CurrentDirectory + @"/Point.txt", FileAttributes.Hidden);
             StreamWriter sr = new StreamWriter(fs);
-            sr.WriteLine("");//开始写入值
+            fs.Seek(0, SeekOrigin.Begin);
+            fs.SetLength(0);
             sr.Close();
             fs.Close();
             Program.point.Clear();
             textBox1.Text = "";
+            label1.Text= "设置坐标个数：" + Program.point.Count;
             MessageBox.Show("已清空！");
         }
 
-        public string PostWebRequest(string postUrl, string paramData, Dictionary<string, string> headers, string RequestType = "POST", bool isFile = false, byte[] stream = null)
+        public static byte[] AuthGetFileData(string fileUrl)
         {
-            string ret = string.Empty;
-            try
-            {
-                byte[] byteArray = Encoding.UTF8.GetBytes(paramData); //转化
-                HttpWebRequest request = (HttpWebRequest)WebRequest.Create(new Uri(postUrl));
-                request.Method = RequestType;
-                // 这个可以是改变的，也可以是下面这个固定的字符串
-                // 创建request对象
-                ServicePointManager.ServerCertificateValidationCallback = new System.Net.Security.RemoteCertificateValidationCallback(CheckValidationResult);
-                request.ContentType = "application/json;charset=utf-8;";
-                request.Accept = "application/json";
+            FileStream fs = new FileStream(fileUrl, FileMode.Open, FileAccess.Read);
+            byte[] buffur = new byte[fs.Length];
 
-                //添加消息头
-                foreach (var header in headers)
-                {
-                    request.Headers.Add(header.Key, header.Value);
-                }
-
-                Stream newStream = null;
-                if (RequestType != "GET")
-                {
-                    if (isFile)
-                    {
-                        string boundary = "—————————7d930d1a850658";
-                        request.ContentType = "multipart/form-data; boundary=" + boundary;
-                        request.ContentLength = stream.Length;
-                        newStream = request.GetRequestStream();
-                        newStream.Write(stream, 0, stream.Length);
-                        newStream.Close();
-                    }
-                    else
-                    {
-                        request.ContentLength = byteArray.Length;
-                        newStream = request.GetRequestStream();
-                        newStream.Write(byteArray, 0, byteArray.Length); //写入参数
-                        newStream.Close();
-                    }
-                }
-                HttpWebResponse response = (HttpWebResponse)request.GetResponse();
-                StreamReader sr = new StreamReader(response.GetResponseStream(), Encoding.UTF8);
-                ret = sr.ReadToEnd();
-                sr.Close();
-                response.Close();
-            }
-            catch (WebException ex)
-            {
-                if (ex.Response != null)
-                {
-                    StreamReader sr = new StreamReader(ex.Response.GetResponseStream(), Encoding.UTF8);
-                    ret = sr.ReadToEnd();
-                }
-            }
-            return ret;
+            fs.Read(buffur, 0, buffur.Length);
+            fs.Close();
+            return buffur;
         }
-
-        public static bool CheckValidationResult(object sender, System.Security.Cryptography.X509Certificates.X509Certificate certificate, System.Security.Cryptography.X509Certificates.X509Chain chain, System.Net.Security.SslPolicyErrors errors)
-        {   // 总是接受    
-            return true;
-        }
-
-        /// <summary>
-        /// 使用Post方法获取字符串结果
-        /// </summary>
-        /// <param name="url"></param>
-        /// <param name="formItems">Post表单内容</param>
-        /// <param name="cookieContainer"></param>
-        /// <param name="timeOut">默认20秒</param>
-        /// <param name="encoding">响应内容的编码类型（默认utf-8）</param>
-        /// <returns></returns>
-        public static string PostForm(string url, List<FormItemModel> formItems, CookieContainer cookieContainer = null, string refererUrl = null, Encoding encoding = null, int timeOut = 20000)
+        private void sendFile_Click(object sender, EventArgs e)
         {
-            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
-            #region 初始化请求对象
-            request.Method = "POST";
-            request.Timeout = timeOut;
-            request.Accept = "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8";
-            request.KeepAlive = true;
-            request.UserAgent = "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/31.0.1650.57 Safari/537.36";
-            if (!string.IsNullOrEmpty(refererUrl))
-                request.Referer = refererUrl;
-            if (cookieContainer != null)
-                request.CookieContainer = cookieContainer;
-            #endregion
-
-            string boundary = "----" + DateTime.Now.Ticks.ToString("x");//分隔符
-            request.ContentType = string.Format("multipart/form-data; boundary={0}", boundary);
-            //请求流
-            var postStream = new MemoryStream();
-            #region 处理Form表单请求内容
-            //是否用Form上传文件
-            var formUploadFile = formItems != null && formItems.Count > 0;
-            if (formUploadFile)
+            using (var client = new HttpClient())
+            using (var content = new MultipartFormDataContent())
             {
-                //文件数据模板
-                string fileFormdataTemplate =
-                    "\r\n--" + boundary +
-                    "\r\nContent-Disposition: form-data; name=\"{0}\"; filename=\"{1}\"" +
-                    "\r\nContent-Type: application/octet-stream" +
-                    "\r\n\r\n";
-                //文本数据模板
-                string dataFormdataTemplate =
-                    "\r\n--" + boundary +
-                    "\r\nContent-Disposition: form-data; name=\"{0}\"" +
-                    "\r\n\r\n{1}";
-                foreach (var item in formItems)
+                client.BaseAddress = new Uri("http://118.25.1.155:9527/ocr");
+                var filecontent1 = new ByteArrayContent(File.ReadAllBytes(@"d:/8cb857379572edf39ea92e5d574acb9.png"));
+                filecontent1.Headers.ContentDisposition = new ContentDispositionHeaderValue("form-data")
                 {
-                    string formdata = null;
-                    if (item.IsFile)
-                    {
-                        //上传文件
-                        formdata = string.Format(
-                            fileFormdataTemplate,
-                            item.Key, //表单键
-                            item.FileName);
-                    }
-                    else
-                    {
-                        //上传文本
-                        formdata = string.Format(
-                            dataFormdataTemplate,
-                            item.Key,
-                            item.Value);
-                    }
-
-                    //统一处理
-                    byte[] formdataBytes = null;
-                    //第一行不需要换行
-                    if (postStream.Length == 0)
-                        formdataBytes = Encoding.UTF8.GetBytes(formdata.Substring(2, formdata.Length - 2));
-                    else
-                        formdataBytes = Encoding.UTF8.GetBytes(formdata);
-                    postStream.Write(formdataBytes, 0, formdataBytes.Length);
-
-                    //写入文件内容
-                    if (item.FileContent != null && item.FileContent.Length > 0)
-                    {
-                        using (var stream = item.FileContent)
-                        {
-                            byte[] buffer = new byte[1024];
-                            int bytesRead = 0;
-                            while ((bytesRead = stream.Read(buffer, 0, buffer.Length)) != 0)
-                            {
-                                postStream.Write(buffer, 0, bytesRead);
-                            }
-                        }
-                    }
-                }
-                //结尾
-                var footer = Encoding.UTF8.GetBytes("\r\n--" + boundary + "--\r\n");
-                postStream.Write(footer, 0, footer.Length);
-
-            }
-            else
-            {
-                request.ContentType = "application/x-www-form-urlencoded";
-            }
-            #endregion
-
-            request.ContentLength = postStream.Length;
-
-            #region 输入二进制流
-            if (postStream != null)
-            {
-                postStream.Position = 0;
-                //直接写入流
-                Stream requestStream = request.GetRequestStream();
-
-                byte[] buffer = new byte[1024];
-                int bytesRead = 0;
-                while ((bytesRead = postStream.Read(buffer, 0, buffer.Length)) != 0)
-                {
-                    requestStream.Write(buffer, 0, bytesRead);
-                }
-
-                ////debug
-                //postStream.Seek(0, SeekOrigin.Begin);
-                //StreamReader sr = new StreamReader(postStream);
-                //var postStr = sr.ReadToEnd();
-                postStream.Close();//关闭文件访问
-            }
-            #endregion
-
-            HttpWebResponse response = (HttpWebResponse)request.GetResponse();
-            if (cookieContainer != null)
-            {
-                response.Cookies = cookieContainer.GetCookies(response.ResponseUri);
-            }
-
-            using (Stream responseStream = response.GetResponseStream())
-            {
-                using (StreamReader myStreamReader = new StreamReader(responseStream, encoding ?? Encoding.UTF8))
-                {
-                    string retString = myStreamReader.ReadToEnd();
-                    return retString;
-                }
+                    Name = "\"file\"",
+                    FileName = "\"8cb857379572edf39ea92e5d574acb9.png\""
+                };
+                filecontent1.Headers.ContentType = new MediaTypeHeaderValue("image/png");
+                //content.headers.add("content-tpye","image/png");
+                content.Add(filecontent1);
+                //content.add(datacontent);
+                var result = client.PostAsync("", content).Result;
+                textBox2.Text = result.Content.ReadAsStringAsync().Result;
             }
         }
 
-        //图片转byte[]   
-        public static byte[] BitmapToBytes(Bitmap bitmap)
-        {
-            using (MemoryStream stream = new MemoryStream())
-            {
-                bitmap.Save(stream, ImageFormat.Jpeg);
-                byte[] data = new byte[stream.Length];
-                stream.Seek(0, SeekOrigin.Begin);
-                stream.Read(data, 0, Convert.ToInt32(stream.Length));
-                return data;
-            }
-        }
 
-        /// <summary>  
-        /// 将 byte[] 转成 Stream  
-        /// </summary>  
-        public Stream BytesToStream(byte[] bytes)
-        {
-            Stream stream = new MemoryStream(bytes);
-            stream.Seek(0, SeekOrigin.Begin);
-            return stream;
-        }
-    }
-
-    /// <summary>
-    /// 表单数据项
-    /// </summary>
-    public class FormItemModel
-    {
-        /// <summary>
-        /// 表单键，request["key"]
-        /// </summary>
-        public string Key { set; get; }
-        /// <summary>
-        /// 表单值,上传文件时忽略，request["key"].value
-        /// </summary>
-        public string Value { set; get; }
-        /// <summary>
-        /// 是否是文件
-        /// </summary>
-        public bool IsFile
-        {
-            get
-            {
-                if (FileContent == null || FileContent.Length == 0)
-                    return false;
-
-                if (FileContent != null && FileContent.Length > 0 && string.IsNullOrEmpty(FileName))
-                    throw new Exception("上传文件时 FileName 属性值不能为空");
-                return true;
-            }
-        }
-        /// <summary>
-        /// 上传的文件名
-        /// </summary>
-        public string FileName { set; get; }
-        /// <summary>
-        /// 上传的文件内容
-        /// </summary>
-        public Stream FileContent { set; get; }
     }
 }

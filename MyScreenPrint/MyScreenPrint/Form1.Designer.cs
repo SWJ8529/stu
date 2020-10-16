@@ -30,17 +30,18 @@
         {
             this.components = new System.ComponentModel.Container();
             this.operationPanel = new System.Windows.Forms.Panel();
+            this.sendFile = new System.Windows.Forms.Button();
+            this.Clean_Point = new System.Windows.Forms.Button();
             this.label1 = new System.Windows.Forms.Label();
             this.button2 = new System.Windows.Forms.Button();
             this.printScrBtn = new System.Windows.Forms.Button();
             this.splitter_1 = new System.Windows.Forms.Label();
             this.picturePanel = new System.Windows.Forms.Panel();
+            this.label3 = new System.Windows.Forms.Label();
+            this.textBox2 = new System.Windows.Forms.TextBox();
             this.label2 = new System.Windows.Forms.Label();
             this.textBox1 = new System.Windows.Forms.TextBox();
             this.bindingSource1 = new System.Windows.Forms.BindingSource(this.components);
-            this.textBox2 = new System.Windows.Forms.TextBox();
-            this.label3 = new System.Windows.Forms.Label();
-            this.Clean_Point = new System.Windows.Forms.Button();
             this.operationPanel.SuspendLayout();
             this.picturePanel.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.bindingSource1)).BeginInit();
@@ -52,6 +53,7 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.operationPanel.BackColor = System.Drawing.SystemColors.ActiveCaption;
             this.operationPanel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.operationPanel.Controls.Add(this.sendFile);
             this.operationPanel.Controls.Add(this.Clean_Point);
             this.operationPanel.Controls.Add(this.label1);
             this.operationPanel.Controls.Add(this.button2);
@@ -62,6 +64,26 @@
             this.operationPanel.Name = "operationPanel";
             this.operationPanel.Size = new System.Drawing.Size(109, 635);
             this.operationPanel.TabIndex = 1;
+            // 
+            // sendFile
+            // 
+            this.sendFile.Location = new System.Drawing.Point(2, 170);
+            this.sendFile.Name = "sendFile";
+            this.sendFile.Size = new System.Drawing.Size(102, 48);
+            this.sendFile.TabIndex = 7;
+            this.sendFile.Text = "发送文件";
+            this.sendFile.UseVisualStyleBackColor = true;
+            this.sendFile.Click += new System.EventHandler(this.sendFile_Click);
+            // 
+            // Clean_Point
+            // 
+            this.Clean_Point.Location = new System.Drawing.Point(2, 57);
+            this.Clean_Point.Name = "Clean_Point";
+            this.Clean_Point.Size = new System.Drawing.Size(102, 48);
+            this.Clean_Point.TabIndex = 6;
+            this.Clean_Point.Text = "清空坐标";
+            this.Clean_Point.UseVisualStyleBackColor = true;
+            this.Clean_Point.Click += new System.EventHandler(this.Clean_Point_Click);
             // 
             // label1
             // 
@@ -78,7 +100,7 @@
             this.button2.Name = "button2";
             this.button2.Size = new System.Drawing.Size(102, 48);
             this.button2.TabIndex = 4;
-            this.button2.Text = "返回测试";
+            this.button2.Text = "生成截图";
             this.button2.UseVisualStyleBackColor = true;
             this.button2.Click += new System.EventHandler(this.button2_Click);
             // 
@@ -117,6 +139,26 @@
             this.picturePanel.Size = new System.Drawing.Size(1068, 635);
             this.picturePanel.TabIndex = 2;
             // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Location = new System.Drawing.Point(3, 349);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(41, 12);
+            this.label3.TabIndex = 3;
+            this.label3.Text = "日志2:";
+            // 
+            // textBox2
+            // 
+            this.textBox2.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.textBox2.Location = new System.Drawing.Point(5, 364);
+            this.textBox2.Multiline = true;
+            this.textBox2.Name = "textBox2";
+            this.textBox2.Size = new System.Drawing.Size(1045, 266);
+            this.textBox2.TabIndex = 2;
+            // 
             // label2
             // 
             this.label2.AutoSize = true;
@@ -136,36 +178,6 @@
             this.textBox1.Name = "textBox1";
             this.textBox1.Size = new System.Drawing.Size(1045, 266);
             this.textBox1.TabIndex = 0;
-            // 
-            // textBox2
-            // 
-            this.textBox2.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.textBox2.Location = new System.Drawing.Point(5, 364);
-            this.textBox2.Multiline = true;
-            this.textBox2.Name = "textBox2";
-            this.textBox2.Size = new System.Drawing.Size(1045, 266);
-            this.textBox2.TabIndex = 2;
-            // 
-            // label3
-            // 
-            this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(3, 349);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(41, 12);
-            this.label3.TabIndex = 3;
-            this.label3.Text = "日志2:";
-            // 
-            // Clean_Point
-            // 
-            this.Clean_Point.Location = new System.Drawing.Point(2, 57);
-            this.Clean_Point.Name = "Clean_Point";
-            this.Clean_Point.Size = new System.Drawing.Size(102, 48);
-            this.Clean_Point.TabIndex = 6;
-            this.Clean_Point.Text = "清空坐标";
-            this.Clean_Point.UseVisualStyleBackColor = true;
-            this.Clean_Point.Click += new System.EventHandler(this.Clean_Point_Click);
             // 
             // Form1
             // 
@@ -199,6 +211,7 @@
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.TextBox textBox2;
         private System.Windows.Forms.Button Clean_Point;
+        private System.Windows.Forms.Button sendFile;
     }
 }
 
