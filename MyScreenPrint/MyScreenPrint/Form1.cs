@@ -13,13 +13,14 @@ using System.Net.Http;
 using RestSharp;
 using System.Net.Http.Headers;
 using Newtonsoft.Json;
-
+using System.Configuration;
 
 namespace MyScreenPrint
 {
     public partial class Form1 : Form
     {
-        System.Timers.Timer timer = new System.Timers.Timer();
+        static String Interval;//定时时间
+        System.Timers.Timer t= new System.Timers.Timer();
         // 截图窗口
         Cutter cutter = null;
 
@@ -80,9 +81,10 @@ namespace MyScreenPrint
 
         private void button2_Click(object sender, EventArgs e)
         {
+            MessageBox.Show("这是测试按钮！点击后会根据坐标截取指定区域的图片，文件将生成在桌面上。","提示");
             Hide();
             Thread.Sleep(200);
-            SaveImg();
+            SaveImg(true);
             Show();
             MessageBox.Show("识别成功！");
         }
@@ -98,7 +100,7 @@ namespace MyScreenPrint
         public static extern IntPtr CreateDC(string lpszDriver, string lpszDevice, string lpszoutput, IntPtr lpdate);
         [DllImport("gdi32.dll")]
         public static extern BootMode BitBlt(IntPtr hdcDest, int x, int y, int widht, int hight, IntPtr hdcsrc, int xsrc, int ysrc, System.Int32 dw);
-        public void SaveImg()
+        public void SaveImg(Boolean flag=false)
         {
             IntPtr dc1 = CreateDC("display", null, null, (IntPtr)null);
             Graphics g1 = Graphics.FromHdc(dc1);
@@ -125,8 +127,10 @@ namespace MyScreenPrint
                     Bitmap bmp = new Bitmap(width, height);
                     Graphics g = Graphics.FromImage(bmp);
                     g.DrawImage(my, new Rectangle(0, 0, width, height), new Rectangle(rectX, rectY, width, height), GraphicsUnit.Pixel);
-
-                    bmp.Save(Environment.GetFolderPath(Environment.SpecialFolder.Desktop) +"\\"+DateTime.Now.ToFileTime().ToString()+".png");
+                    if (flag)
+                    {
+                        bmp.Save(Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "\\" + DateTime.Now.ToFileTime().ToString() + ".png");
+                    }                    
                     MemoryStream ms = new MemoryStream();
                     bmp.Save(ms, ImageFormat.Png);
                     byte[] picdata = ms.GetBuffer();//StreamToBytes(ms);
@@ -134,9 +138,10 @@ namespace MyScreenPrint
                     string response = PICRequest(picdata, DateTime.Now.ToFileTime().ToString());
                     PICResponse pir = JsonConvert.DeserializeObject<PICResponse>(response);
                     textBox2.Text += //string.IsNullOrEmpty(pir.data) ?"该坐标无法识别出数字："+ line+"   ": 
-                        response + "\r\n";
+                        DateTime.Now.ToString()+" : "+response + "\r\n";
                     ms.Close();
                 }
+                textBox2.Text += "\r\n";
             }
             else {
                 MessageBox.Show("请设置坐标！","提示");
@@ -148,6 +153,8 @@ namespace MyScreenPrint
         private void Form1_Load(object sender, EventArgs e)
         {
             label1.Text = "设置坐标个数：" + Program.point.Count;
+            Interval = ConfigurationManager.AppSettings["Time"];
+            timetext.Text = Interval;
             if (Program.point.Count > 0)
             {
                 foreach (string line in Program.point)
@@ -155,6 +162,9 @@ namespace MyScreenPrint
                     textBox1.Text += line+"\r\n";
                 }
             }
+            System.Windows.Forms.Control.CheckForIllegalCrossThreadCalls = false;
+            t.Elapsed += new System.Timers.ElapsedEventHandler(Timer_TimesUp);
+            t.AutoReset = true; //每到指定时间Elapsed事件是触发一次（false），还是一直触发（true）
         }
 
         private void Clean_Point_Click(object sender, EventArgs e)
@@ -192,28 +202,6 @@ namespace MyScreenPrint
             Image image = System.Drawing.Image.FromStream(ms);
             return image;
         }
-
-        //private void sendFile_Click(object sender, EventArgs e)
-        //{
-        //    using (var client = new HttpClient())
-        //    using (var content = new MultipartFormDataContent())
-        //    {
-        //        client.BaseAddress = new Uri("http://118.25.1.155:9527/ocr");
-        //        var filecontent1 = new ByteArrayContent(File.ReadAllBytes(@"d:/8cb857379572edf39ea92e5d574acb9.png"));
-        //        filecontent1.Headers.ContentDisposition = new ContentDispositionHeaderValue("form-data")
-        //        {
-        //            Name = "\"file\"",
-        //            FileName = "\"8cb857379572edf39ea92e5d574acb9.png\""
-        //        };
-        //        filecontent1.Headers.ContentType = new MediaTypeHeaderValue("image/png");
-        //        //content.headers.add("content-tpye","image/png");
-        //        content.Add(filecontent1);
-        //        //content.add(datacontent);
-        //        var result = client.PostAsync("", content).Result;
-        //        textBox2.Text = result.Content.ReadAsStringAsync().Result;
-        //    }
-        //}
-
         /// <summary>
         /// 图片识别请求
         /// </summary>
@@ -240,9 +228,49 @@ namespace MyScreenPrint
             }
         }
 
+        private void timebtn_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(Interval) || !Interval.Equals(timetext.Text))
+                {
+                    Configuration config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
+                    config.AppSettings.Settings["Time"].Value = timetext.Text;
+                    config.Save(ConfigurationSaveMode.Modified);
+                    Interval = timetext.Text;
+                }
+                t.Interval = Convert.ToDouble(Interval);
+                if (timebtn.Text == "启动")
+                {
+                    //最小化窗口
+                    WindowState = FormWindowState.Minimized;
+                    Thread.Sleep(200);
+                    t.Enabled = true; //是否触发Elapsed事件
+                    t.Start();
+                    timebtn.Text = "停止";
+                }
+                else
+                {
+                    t.Stop();
+                    timebtn.Text = "启动";
+                }
+            }catch(Exception ex)
+            {
+                MessageBox.Show(ex.ToString(),"警告！");
+            }
+            
+        }
 
+        private void Timer_TimesUp(object sender, System.Timers.ElapsedEventArgs e)
+        {
+            //到达指定时间截取屏幕指定区域并且识别内容
+            SaveImg();
+        }
 
-
+        private void cleanlog_Click(object sender, EventArgs e)
+        {
+            textBox2.Text = "";
+        }
     }
 
     public class PICResponse
