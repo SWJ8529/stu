@@ -81,10 +81,19 @@ namespace MyScreenPrint
 
         private void button2_Click(object sender, EventArgs e)
         {
-            MessageBox.Show("这是测试按钮！点击后会根据坐标截取指定区域的图片，文件将生成在桌面上。","提示");
+            DialogResult dr= MessageBox.Show("这是测试按钮！点击后会根据坐标截取指定区域的图片，文件将生成在桌面上。","提示",MessageBoxButtons.YesNo);
+
             Hide();
             Thread.Sleep(200);
-            SaveImg(true);
+            if (dr == DialogResult.Yes)
+            {
+                SaveImg(true);
+            }
+            else
+            {
+                SaveImg(false);
+            }
+
             Show();
             MessageBox.Show("识别成功！");
         }
