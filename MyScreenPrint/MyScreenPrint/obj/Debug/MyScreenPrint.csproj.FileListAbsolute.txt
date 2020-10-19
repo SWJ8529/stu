@@ -48,8 +48,8 @@ E:\stu\MyScreenPrint\MyScreenPrint\obj\Debug\MyScreenPrint.Properties.Resources.
 E:\stu\MyScreenPrint\MyScreenPrint\obj\Debug\MyScreenPrint.csproj.GenerateResource.cache
 E:\stu\MyScreenPrint\MyScreenPrint\obj\Debug\MyScreenPrint.csproj.CoreCompileInputs.cache
 E:\stu\MyScreenPrint\MyScreenPrint\obj\Debug\MyScreenPrint.csproj.CopyComplete
+E:\stu\MyScreenPrint\MyScreenPrint\bin\Debug\图片识别插件.pdb
+E:\stu\MyScreenPrint\MyScreenPrint\obj\Debug\图片识别插件.pdb
 E:\stu\MyScreenPrint\MyScreenPrint\bin\Debug\图片识别插件.exe.config
 E:\stu\MyScreenPrint\MyScreenPrint\bin\Debug\图片识别插件.exe
-E:\stu\MyScreenPrint\MyScreenPrint\bin\Debug\图片识别插件.pdb
 E:\stu\MyScreenPrint\MyScreenPrint\obj\Debug\图片识别插件.exe
-E:\stu\MyScreenPrint\MyScreenPrint\obj\Debug\图片识别插件.pdb
