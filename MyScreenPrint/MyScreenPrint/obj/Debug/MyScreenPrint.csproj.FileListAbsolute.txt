@@ -39,9 +39,7 @@ C:\Users\Administrator\Desktop\stu-master\stu-master\MyScreenPrint\MyScreenPrint
 C:\Users\Administrator\Desktop\stu-master\stu-master\MyScreenPrint\MyScreenPrint\bin\Debug\RestSharp.dll
 C:\Users\Administrator\Desktop\stu-master\stu-master\MyScreenPrint\MyScreenPrint\bin\Debug\RestSharp.xml
 E:\stu\MyScreenPrint\MyScreenPrint\bin\Debug\Newtonsoft.Json.dll
-E:\stu\MyScreenPrint\MyScreenPrint\bin\Debug\RestSharp.dll
 E:\stu\MyScreenPrint\MyScreenPrint\bin\Debug\Newtonsoft.Json.xml
-E:\stu\MyScreenPrint\MyScreenPrint\bin\Debug\RestSharp.xml
 E:\stu\MyScreenPrint\MyScreenPrint\obj\Debug\MyScreenPrint.Cutter.resources
 E:\stu\MyScreenPrint\MyScreenPrint\obj\Debug\MyScreenPrint.Form1.resources
 E:\stu\MyScreenPrint\MyScreenPrint\obj\Debug\MyScreenPrint.Properties.Resources.resources
@@ -50,6 +48,6 @@ E:\stu\MyScreenPrint\MyScreenPrint\obj\Debug\MyScreenPrint.csproj.CoreCompileInp
 E:\stu\MyScreenPrint\MyScreenPrint\obj\Debug\MyScreenPrint.csproj.CopyComplete
 E:\stu\MyScreenPrint\MyScreenPrint\bin\Debug\图片识别插件.pdb
 E:\stu\MyScreenPrint\MyScreenPrint\obj\Debug\图片识别插件.pdb
-E:\stu\MyScreenPrint\MyScreenPrint\bin\Debug\图片识别插件.exe.config
-E:\stu\MyScreenPrint\MyScreenPrint\bin\Debug\图片识别插件.exe
-E:\stu\MyScreenPrint\MyScreenPrint\obj\Debug\图片识别插件.exe
+E:\stu\MyScreenPrint\MyScreenPrint\bin\Debug\图片识别插件.dll.config
+E:\stu\MyScreenPrint\MyScreenPrint\bin\Debug\图片识别插件.dll
+E:\stu\MyScreenPrint\MyScreenPrint\obj\Debug\图片识别插件.dll

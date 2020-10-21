@@ -5,15 +5,17 @@ using System.Threading;
 using System.Runtime.InteropServices;
 using System.IO;
 using System.Drawing.Imaging;
-using System.Net.Http;
-using System.Net.Http.Headers;
 using Newtonsoft.Json;
 using System.Configuration;
+using System.Net;
+using System.Text;
 
 namespace MyScreenPrint
 {
     public partial class Form1 : Form
     {
+        static string url;
+        Configuration config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
         static String Interval;//定时时间
         System.Timers.Timer t= new System.Timers.Timer();
         // 截图窗口
@@ -65,7 +67,7 @@ namespace MyScreenPrint
             cutter.ShowDialog();
 
             textBox1.Text = cutter.sb.ToString();
-            label1.Text = "设置坐标个数：" + Program.point.Count;
+            label1.Text = "设置坐标个数：" + ReadZB.point.Count;
             // 显示所截得的图片
             //UpdateScreen();
 
@@ -77,7 +79,7 @@ namespace MyScreenPrint
         private void button2_Click(object sender, EventArgs e)
         {
             DialogResult dr= MessageBox.Show("这是测试按钮！点击后会根据坐标截取指定区域的图片，文件将生成在桌面上。","提示",MessageBoxButtons.YesNo);
-
+            
             Hide();
             Thread.Sleep(200);
             if (dr == DialogResult.Yes)
@@ -104,8 +106,9 @@ namespace MyScreenPrint
         public static extern IntPtr CreateDC(string lpszDriver, string lpszDevice, string lpszoutput, IntPtr lpdate);
         [DllImport("gdi32.dll")]
         public static extern BootMode BitBlt(IntPtr hdcDest, int x, int y, int widht, int hight, IntPtr hdcsrc, int xsrc, int ysrc, System.Int32 dw);
-        public void SaveImg(Boolean flag=false)
+        public string SaveImg(Boolean flag=false)
         {
+            string ret=string.Empty;
             IntPtr dc1 = CreateDC("display", null, null, (IntPtr)null);
             Graphics g1 = Graphics.FromHdc(dc1);
             Bitmap my = new Bitmap(Screen.PrimaryScreen.Bounds.Width, Screen.PrimaryScreen.Bounds.Height, g1);
@@ -118,9 +121,9 @@ namespace MyScreenPrint
 
 
             #region 获取坐标
-            if (Program.point.Count > 0)
+            if (ReadZB.point.Count > 0)
             {
-                foreach (string line in Program.point)
+                foreach (string line in ReadZB.point)
                 {
                     rectX = Convert.ToInt32(line.Split(',')[0]);
                     rectY = Convert.ToInt32(line.Split(',')[1]);
@@ -139,29 +142,35 @@ namespace MyScreenPrint
                     bmp.Save(ms, ImageFormat.Png);
                     byte[] picdata = ms.GetBuffer();//StreamToBytes(ms);
                     //BytesToImage(picdata);
-                    string response = PICRequest(picdata, DateTime.Now.ToFileTime().ToString());
+                    string response = CreatePostData(url, DateTime.Now.ToFileTime().ToString(), picdata);
                     PICResponse pir = JsonConvert.DeserializeObject<PICResponse>(response);
                     textBox2.Text += //string.IsNullOrEmpty(pir.data) ?"该坐标无法识别出数字："+ line+"   ": 
                         DateTime.Now.ToString()+" : "+response + "\r\n";
                     ms.Close();
+                    if (!string.IsNullOrEmpty(pir.data))
+                    {
+                        ret = JsonConvert.SerializeObject(pir);
+                    }
                 }
                 textBox2.Text += "\r\n";
             }
             else {
                 MessageBox.Show("请设置坐标！","提示");
+                ret= "{\"msg\":\"读取坐标失败!\",\"code\":500,\"data\":\"\"}";
             }
-
+            return ret;
             #endregion
         }
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            label1.Text = "设置坐标个数：" + Program.point.Count;
+            url = ConfigurationManager.AppSettings["URL"];
+            label1.Text = "设置坐标个数：" + ReadZB.point.Count;
             Interval = ConfigurationManager.AppSettings["Time"];
             timetext.Text = Interval;
-            if (Program.point.Count > 0)
+            if (ReadZB.point.Count > 0)
             {
-                foreach (string line in Program.point)
+                foreach (string line in ReadZB.point)
                 {
                     textBox1.Text += line+"\r\n";
                 }
@@ -180,9 +189,9 @@ namespace MyScreenPrint
             fs.SetLength(0);
             sr.Close();
             fs.Close();
-            Program.point.Clear();
+            ReadZB.point.Clear();
             textBox1.Text = "";
-            label1.Text= "设置坐标个数：" + Program.point.Count;
+            label1.Text= "设置坐标个数：" + ReadZB.point.Count;
             MessageBox.Show("已清空！");
         }
 
@@ -206,32 +215,88 @@ namespace MyScreenPrint
             Image image = System.Drawing.Image.FromStream(ms);
             return image;
         }
-        /// <summary>
-        /// 图片识别请求
-        /// </summary>
-        /// <param name="data"></param>
-        /// <param name="filename"></param>
-        /// <returns></returns>
-        private string PICRequest(byte[] data,string filename) {
-            using (var client = new HttpClient())
-            using (var content = new MultipartFormDataContent())
-            {
-                client.BaseAddress = new Uri("http://118.25.1.155:9527/ocr");
-                var filecontent1 = new ByteArrayContent(data);
-                filecontent1.Headers.ContentDisposition = new ContentDispositionHeaderValue("form-data")
-                {
-                    Name = "\"file\"",
-                    FileName = filename+".png"
-                };
-                filecontent1.Headers.ContentType = new MediaTypeHeaderValue("image/png");
-                //content.headers.add("content-tpye","image/png");
-                content.Add(filecontent1);
-                //content.add(datacontent);
-                var result = client.PostAsync("", content).Result;
-                return result.Content.ReadAsStringAsync().Result;
-            }
-        }
+        ///// <summary>
+        ///// 图片识别请求
+        ///// </summary>
+        ///// <param name="data"></param>
+        ///// <param name="filename"></param>
+        ///// <returns></returns>
+        //private string PICRequest(byte[] data,string filename) {
+        //    using (var client = new HttpClient())
+        //    using (var content = new MultipartFormDataContent())
+        //    {
+        //        client.BaseAddress = new Uri("http://118.25.1.155:9527/ocr");
+        //        var filecontent1 = new ByteArrayContent(data);
+        //        filecontent1.Headers.ContentDisposition = new ContentDispositionHeaderValue("form-data")
+        //        {
+        //            Name = "\"file\"",
+        //            FileName = filename+".png"
+        //        };
+        //        filecontent1.Headers.ContentType = new MediaTypeHeaderValue("image/png");
+        //        //content.headers.add("content-tpye","image/png");
+        //        content.Add(filecontent1);
+        //        //content.add(datacontent);
+        //        var result = client.PostAsync("", content).Result;
+        //        return result.Content.ReadAsStringAsync().Result;
+        //    }
+        //}
+        public string CreatePostData(string url, string filename, byte[] data)
+        {
 
+            Stream fileStream = new MemoryStream(data);
+
+            BinaryReader br = new BinaryReader(fileStream);
+
+            byte[] buffer = br.ReadBytes(Convert.ToInt32(fileStream.Length));
+            string boundary = "---------------------------" + DateTime.Now.Ticks.ToString("x");
+            //请求
+            WebRequest req = WebRequest.Create(url);
+            req.Method = "POST";
+            req.ContentType = "multipart/form-data; boundary=" + boundary;
+            //组织表单数据
+            StringBuilder sb = new StringBuilder();
+            sb.Append("--" + boundary + "\r\n");
+            sb.Append("Content-Disposition: form-data; name=\"file\"; filename=\"" + filename + "\";");
+            sb.Append("\r\n");
+            sb.Append("Content-Type: image/png");
+            sb.Append("\r\n\r\n");
+            string head = sb.ToString();
+            byte[] form_data = Encoding.UTF8.GetBytes(head);
+            //结尾
+            byte[] foot_data = Encoding.UTF8.GetBytes("\r\n--" + boundary + "--\r\n");
+            //post总长度
+            long length = form_data.Length + fileStream.Length + foot_data.Length;
+            req.ContentLength = length;
+            Stream requestStream = req.GetRequestStream();
+            //这里要注意一下发送顺序，先发送form_data > buffer > foot_data
+            //发送表单参数
+            requestStream.Write(form_data, 0, form_data.Length);
+            //发送文件内容
+            requestStream.Write(buffer, 0, buffer.Length);
+            //结尾
+            requestStream.Write(foot_data, 0, foot_data.Length);
+            requestStream.Close();
+            fileStream.Close();
+            fileStream.Dispose();
+            br.Close();
+            // br.Dispose();
+            //响应
+            WebResponse pos = req.GetResponse();
+            StreamReader sr = new StreamReader(pos.GetResponseStream(), Encoding.UTF8);
+            string html = sr.ReadToEnd().Trim();
+            sr.Close();
+            sr.Dispose();
+            if (pos != null)
+            {
+                pos.Close();
+                pos = null;
+            }
+            if (req != null)
+            {
+                req = null;
+            }
+            return html;
+        }
         private void timebtn_Click(object sender, EventArgs e)
         {
             try
@@ -268,6 +333,7 @@ namespace MyScreenPrint
         private void Timer_TimesUp(object sender, System.Timers.ElapsedEventArgs e)
         {
             //到达指定时间截取屏幕指定区域并且识别内容
+                      
             SaveImg();
         }
 

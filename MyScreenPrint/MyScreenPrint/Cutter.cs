@@ -137,8 +137,8 @@ namespace MyScreenPrint
                 sr.WriteLine(sb);//开始写入值
                 sr.Close();
                 fs.Close();
-                ReadPoint rp = JsonConvert.DeserializeObject<ReadPoint>("{\"point\":["+sb.ToString()+ "]}");
-                Program.point = rp.point;
+                ReadZB.ReadPoint rp = JsonConvert.DeserializeObject<ReadZB.ReadPoint>("{\"point\":["+sb.ToString()+ "]}");
+                ReadZB.point = rp.point;
 
                 Update();
 
