@@ -4,11 +4,15 @@ using System.Windows.Forms;
 using System.Drawing;
 using System.IO;
 using Newtonsoft.Json;
+using System.Collections.Generic;
+using System.Configuration;
 
 namespace MyScreenPrint
 {
     class Cutter : Form
     {
+        static List<string> list = ReadZB.point;
+        ReadZB.ReadPoint rp = new ReadZB.ReadPoint();
         // 是否开始截图
         private bool isCatchStart = false;
         
@@ -23,8 +27,6 @@ namespace MyScreenPrint
 
         // 确认按钮
         private Button OK_btn = null;
-
-        public StringBuilder sb = new StringBuilder();
 
         // 截图窗口构造
         public Cutter() : base()
@@ -121,24 +123,21 @@ namespace MyScreenPrint
                 OK_btn.Text = "确认！";
                 OK_btn.Click += (sende, ee) => DialogResult = DialogResult.OK;
                 Controls.Add(OK_btn);
-                sb.Append("\"" + rectX + "," + rectY + "," + width + "," + height + "\",\r\n");
 
-                var lines = File.ReadAllLines(Environment.CurrentDirectory + @"/Point.txt");
-                foreach (var line in lines)
-                {
-                    if (!string.IsNullOrEmpty(line))
-                    {
-                        sb.Append(line+"\r\n");
-                    }
-                }
-                FileStream fs = new FileStream(Environment.CurrentDirectory + @"/Point.txt", FileMode.Open, FileAccess.Write);
-                System.IO.File.SetAttributes(Environment.CurrentDirectory + @"/Point.txt", FileAttributes.Hidden);
+                
+
+                list.Add(rectX + "," + rectY + "," + width + "," + height);
+
+                rp.point = list;
+                rp.url= ReadZB._URL;
+
+                FileStream fs = new FileStream(ReadZB.FilePath, FileMode.Open, FileAccess.Write);
+                System.IO.File.SetAttributes(ReadZB.FilePath, FileAttributes.Hidden);
                 StreamWriter sr = new StreamWriter(fs);
-                sr.WriteLine(sb);//开始写入值
+                sr.WriteLine(JsonConvert.SerializeObject(rp));//开始写入值
                 sr.Close();
                 fs.Close();
-                ReadZB.ReadPoint rp = JsonConvert.DeserializeObject<ReadZB.ReadPoint>("{\"point\":["+sb.ToString()+ "]}");
-                ReadZB.point = rp.point;
+                ReadZB.point = list;
 
                 Update();
 

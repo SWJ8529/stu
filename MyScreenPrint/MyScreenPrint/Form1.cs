@@ -14,7 +14,6 @@ namespace MyScreenPrint
 {
     public partial class Form1 : Form
     {
-        static string url;
         Configuration config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
         static String Interval;//定时时间
         System.Timers.Timer t= new System.Timers.Timer();
@@ -65,8 +64,12 @@ namespace MyScreenPrint
             // 显示截图窗口
             cutter.WindowState = FormWindowState.Maximized;
             cutter.ShowDialog();
-
-            textBox1.Text = cutter.sb.ToString();
+            textBox1.Text = "";
+            foreach (string p in ReadZB.point)
+            {
+                textBox1.Text += p+"\r\n";
+            }
+            
             label1.Text = "设置坐标个数：" + ReadZB.point.Count;
             // 显示所截得的图片
             //UpdateScreen();
@@ -142,7 +145,7 @@ namespace MyScreenPrint
                     bmp.Save(ms, ImageFormat.Png);
                     byte[] picdata = ms.GetBuffer();//StreamToBytes(ms);
                     //BytesToImage(picdata);
-                    string response = CreatePostData(url, DateTime.Now.ToFileTime().ToString(), picdata);
+                    string response = CreatePostData(ReadZB._URL, DateTime.Now.ToFileTime().ToString(), picdata);
                     PICResponse pir = JsonConvert.DeserializeObject<PICResponse>(response);
                     textBox2.Text += //string.IsNullOrEmpty(pir.data) ?"该坐标无法识别出数字："+ line+"   ": 
                         DateTime.Now.ToString()+" : "+response + "\r\n";
@@ -164,7 +167,6 @@ namespace MyScreenPrint
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            url = ConfigurationManager.AppSettings["URL"];
             label1.Text = "设置坐标个数：" + ReadZB.point.Count;
             Interval = ConfigurationManager.AppSettings["Time"];
             timetext.Text = Interval;
@@ -182,11 +184,13 @@ namespace MyScreenPrint
 
         private void Clean_Point_Click(object sender, EventArgs e)
         {
-            FileStream fs = new FileStream(Environment.CurrentDirectory + @"/Point.txt", FileMode.Open, FileAccess.Write);
-            System.IO.File.SetAttributes(Environment.CurrentDirectory + @"/Point.txt", FileAttributes.Hidden);
+            FileStream fs = new FileStream(ReadZB.FilePath, FileMode.Open, FileAccess.Write);
+            System.IO.File.SetAttributes(ReadZB.FilePath, FileAttributes.Hidden);
             StreamWriter sr = new StreamWriter(fs);
             fs.Seek(0, SeekOrigin.Begin);
             fs.SetLength(0);
+            ReadZB.point.Clear();
+            sr.WriteLine(JsonConvert.SerializeObject(new ReadZB.ReadPoint() { point=ReadZB.point,url=ReadZB._URL}));//开始写入值
             sr.Close();
             fs.Close();
             ReadZB.point.Clear();
@@ -215,31 +219,6 @@ namespace MyScreenPrint
             Image image = System.Drawing.Image.FromStream(ms);
             return image;
         }
-        ///// <summary>
-        ///// 图片识别请求
-        ///// </summary>
-        ///// <param name="data"></param>
-        ///// <param name="filename"></param>
-        ///// <returns></returns>
-        //private string PICRequest(byte[] data,string filename) {
-        //    using (var client = new HttpClient())
-        //    using (var content = new MultipartFormDataContent())
-        //    {
-        //        client.BaseAddress = new Uri("http://118.25.1.155:9527/ocr");
-        //        var filecontent1 = new ByteArrayContent(data);
-        //        filecontent1.Headers.ContentDisposition = new ContentDispositionHeaderValue("form-data")
-        //        {
-        //            Name = "\"file\"",
-        //            FileName = filename+".png"
-        //        };
-        //        filecontent1.Headers.ContentType = new MediaTypeHeaderValue("image/png");
-        //        //content.headers.add("content-tpye","image/png");
-        //        content.Add(filecontent1);
-        //        //content.add(datacontent);
-        //        var result = client.PostAsync("", content).Result;
-        //        return result.Content.ReadAsStringAsync().Result;
-        //    }
-        //}
         public string CreatePostData(string url, string filename, byte[] data)
         {
 
