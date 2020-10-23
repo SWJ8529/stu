@@ -50,5 +50,4 @@ E:\stu\MyScreenPrint\MyScreenPrint\bin\Debug\图片识别插件.pdb
 E:\stu\MyScreenPrint\MyScreenPrint\obj\Debug\图片识别插件.pdb
 E:\stu\MyScreenPrint\MyScreenPrint\bin\Debug\图片识别插件.exe.config
 E:\stu\MyScreenPrint\MyScreenPrint\bin\Debug\图片识别插件.exe
-E:\stu\MyScreenPrint\MyScreenPrint\obj\Debug\MyScreenPrint.csprojAssemblyReference.cache
 E:\stu\MyScreenPrint\MyScreenPrint\obj\Debug\图片识别插件.exe

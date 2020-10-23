@@ -14,6 +14,8 @@ namespace MyScreenPrint
 {
     public partial class Form1 : Form
     {
+        Form FloatForm = new Form();//创建悬浮窗
+        Label FloatLabel = new Label();//创建悬浮窗上的文本
         Configuration config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
         static String Interval;//定时时间
         System.Timers.Timer t= new System.Timers.Timer();
@@ -150,16 +152,32 @@ namespace MyScreenPrint
                     textBox2.Text += //string.IsNullOrEmpty(pir.data) ?"该坐标无法识别出数字："+ line+"   ": 
                         DateTime.Now.ToString()+" : "+response + "\r\n";
                     ms.Close();
-                    if (!string.IsNullOrEmpty(pir.data))
+                    if (!string.IsNullOrEmpty(pir.data))//判断是否为空
                     {
-                        ret = JsonConvert.SerializeObject(pir);
+                        try
+                        {
+                            decimal.Parse(pir.data);//尝试将内容转为数字
+                            ret = JsonConvert.SerializeObject(pir);
+                            FloatLabel.Text = "金额：" + pir.data;
+                            break;//跳出循环
+                        }
+                        catch (Exception ex)
+                        {
+                            continue;//继续循环
+                        }
+
+                    }
+                    else
+                    {
+                        FloatLabel.Text = "金额：0";
                     }
                 }
                 textBox2.Text += "\r\n";
             }
             else {
                 MessageBox.Show("请设置坐标！","提示");
-                ret= "{\"msg\":\"读取坐标失败!\",\"code\":500,\"data\":\"\"}";
+                FloatLabel.Text = "金额：0";
+                ret = "{\"msg\":\"读取坐标失败!\",\"code\":500,\"data\":\"\"}";
             }
             return ret;
             #endregion
@@ -167,6 +185,7 @@ namespace MyScreenPrint
 
         private void Form1_Load(object sender, EventArgs e)
         {
+            
             label1.Text = "设置坐标个数：" + ReadZB.point.Count;
             Interval = ConfigurationManager.AppSettings["Time"];
             timetext.Text = Interval;
@@ -177,9 +196,34 @@ namespace MyScreenPrint
                     textBox1.Text += line+"\r\n";
                 }
             }
+
+
+            m_aeroEnabled = false;
             System.Windows.Forms.Control.CheckForIllegalCrossThreadCalls = false;
             t.Elapsed += new System.Timers.ElapsedEventHandler(Timer_TimesUp);
             t.AutoReset = true; //每到指定时间Elapsed事件是触发一次（false），还是一直触发（true）
+            FloatForm.FormBorderStyle = FormBorderStyle.None;
+            FloatForm.TopMost = true;//设置窗口永远为屏幕前面
+            FloatForm.ShowInTaskbar = false;//不在任务栏中显示以免误关
+            FloatForm.Width=80;
+            FloatForm.Height = 30;
+            FloatForm.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
+            FloatForm.MaximizeBox = false;
+            FloatForm.MinimizeBox = false;
+            int x = (SystemInformation.WorkingArea.Width - FloatForm.Size.Width) / 2;
+            int y = (SystemInformation.WorkingArea.Height - FloatForm.Size.Height) / 2;
+            FloatForm.StartPosition = FormStartPosition.Manual; //窗体的位置由Location属性决定
+            FloatForm.Location = (Point)new Size(x, 0);         //窗体的起始位置为(x,y)
+            
+            FloatLabel.Location = new Point(0,10);
+            FloatLabel.AutoSize = true;
+            FloatLabel.Width = 78;
+            FloatLabel.Height = 28;
+            FloatLabel.Font= new Font(this.Font.FontFamily, 18);
+
+            FloatLabel.Text = "金额：0";
+            FloatForm.Controls.Add(FloatLabel);
+            FloatForm.Show();
         }
 
         private void Clean_Point_Click(object sender, EventArgs e)
@@ -320,6 +364,100 @@ namespace MyScreenPrint
         {
             textBox2.Text = "";
         }
+
+        [DllImport("Gdi32.dll", EntryPoint = "CreateRoundRectRgn")]
+        private static extern IntPtr CreateRoundRectRgn
+    (
+        int nLeftRect, // x-coordinate of upper-left corner
+        int nTopRect, // y-coordinate of upper-left corner
+        int nRightRect, // x-coordinate of lower-right corner
+        int nBottomRect, // y-coordinate of lower-right corner
+        int nWidthEllipse, // height of ellipse
+        int nHeightEllipse // width of ellipse
+     );
+
+        [DllImport("dwmapi.dll")]
+        public static extern int DwmExtendFrameIntoClientArea(IntPtr hWnd, ref MARGINS pMarInset);
+
+        [DllImport("dwmapi.dll")]
+        public static extern int DwmSetWindowAttribute(IntPtr hwnd, int attr, ref int attrValue, int attrSize);
+
+        [DllImport("dwmapi.dll")]
+        public static extern int DwmIsCompositionEnabled(ref int pfEnabled);
+
+        private bool m_aeroEnabled;                     // variables for box shadow
+        private const int CS_DROPSHADOW = 0x00020000;
+        private const int WM_NCPAINT = 0x0085;
+        private const int WM_ACTIVATEAPP = 0x001C;
+
+        public struct MARGINS                           // struct for box shadow
+        {
+            public int leftWidth;
+            public int rightWidth;
+            public int topHeight;
+            public int bottomHeight;
+        }
+
+        private const int WM_NCHITTEST = 0x84;          // variables for dragging the form
+        private const int HTCLIENT = 0x1;
+        private const int HTCAPTION = 0x2;
+
+        protected override CreateParams CreateParams
+        {
+            get
+            {
+                m_aeroEnabled = CheckAeroEnabled();
+
+                CreateParams cp = base.CreateParams;
+                if (!m_aeroEnabled)
+                    cp.ClassStyle |= CS_DROPSHADOW;
+
+                return cp;
+            }
+        }
+
+        private bool CheckAeroEnabled()
+        {
+            if (Environment.OSVersion.Version.Major >= 6)
+            {
+                int enabled = 0;
+                DwmIsCompositionEnabled(ref enabled);
+                return (enabled == 1) ? true : false;
+            }
+            return false;
+        }
+
+        protected override void WndProc(ref Message m)
+        {
+            switch (m.Msg)
+            {
+                case WM_NCPAINT:                        // box shadow
+                    if (m_aeroEnabled)
+                    {
+                        var v = 2;
+                        DwmSetWindowAttribute(this.Handle, 2, ref v, 4);
+                        MARGINS margins = new MARGINS()
+                        {
+                            bottomHeight = 1,
+                            leftWidth = 1,
+                            rightWidth = 1,
+                            topHeight = 1
+                        };
+                        DwmExtendFrameIntoClientArea(this.Handle, ref margins);
+
+                    }
+                    break;
+                default:
+                    break;
+            }
+            base.WndProc(ref m);
+
+            if (m.Msg == WM_NCHITTEST && (int)m.Result == HTCLIENT)     // drag the form
+                m.Result = (IntPtr)HTCAPTION;
+
+        }
+
+
     }
 
     public class PICResponse
