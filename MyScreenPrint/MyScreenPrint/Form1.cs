@@ -14,8 +14,16 @@ namespace MyScreenPrint
 {
     public partial class Form1 : Form
     {
-        Form FloatForm = new Form();//创建悬浮窗
-        Label FloatLabel = new Label();//创建悬浮窗上的文本
+
+        FloatForm floatForm = new FloatForm();//创建悬浮窗
+
+        CheckBox isStartUp = new CheckBox();//创建开机启动按钮
+
+        CheckBox isStartService = new CheckBox();//创建是否开机启动服务按钮
+
+        Form setting = new Form();//更多设置窗体
+
+
         Configuration config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
         static String Interval;//定时时间
         System.Timers.Timer t= new System.Timers.Timer();
@@ -72,7 +80,7 @@ namespace MyScreenPrint
                 textBox1.Text += p+"\r\n";
             }
             
-            label1.Text = "设置坐标个数：" + ReadZB.point.Count;
+            label1.Text = "设置坐标个数:" + ReadZB.point.Count;
             // 显示所截得的图片
             //UpdateScreen();
 
@@ -139,17 +147,20 @@ namespace MyScreenPrint
                     Bitmap bmp = new Bitmap(width, height);
                     Graphics g = Graphics.FromImage(bmp);
                     g.DrawImage(my, new Rectangle(0, 0, width, height), new Rectangle(rectX, rectY, width, height), GraphicsUnit.Pixel);
+
                     if (flag)
                     {
-                        bmp.Save(Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "\\" + DateTime.Now.ToFileTime().ToString() + ".png");
-                    }                    
+                        bmp.Save(Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "\\" + DateTime.Now.ToFileTime().ToString() + ".png");                    
+                    }
+                    
+
                     MemoryStream ms = new MemoryStream();
                     bmp.Save(ms, ImageFormat.Png);
                     byte[] picdata = ms.GetBuffer();//StreamToBytes(ms);
                     //BytesToImage(picdata);
                     string response = CreatePostData(ReadZB._URL, DateTime.Now.ToFileTime().ToString(), picdata);
                     PICResponse pir = JsonConvert.DeserializeObject<PICResponse>(response);
-                    textBox2.Text += //string.IsNullOrEmpty(pir.data) ?"该坐标无法识别出数字："+ line+"   ": 
+                    textBox2.Text += //string.IsNullOrEmpty(pir.data) ?"该坐标无法识别出数字:"+ line+"   ": 
                         DateTime.Now.ToString()+" : "+response + "\r\n";
                     ms.Close();
                     if (!string.IsNullOrEmpty(pir.data))//判断是否为空
@@ -158,7 +169,7 @@ namespace MyScreenPrint
                         {
                             decimal.Parse(pir.data);//尝试将内容转为数字
                             ret = JsonConvert.SerializeObject(pir);
-                            FloatLabel.Text = "金额：" + pir.data;
+                            floatForm.FloatLabel.Text = "金额:" + pir.data;
                             break;//跳出循环
                         }
                         catch (Exception ex)
@@ -169,24 +180,31 @@ namespace MyScreenPrint
                     }
                     else
                     {
-                        FloatLabel.Text = "金额：0";
+                        floatForm.FloatLabel.Text = "金额:0";
                     }
                 }
                 textBox2.Text += "\r\n";
             }
             else {
+                t.Stop();
+                timebtn.Text = "启动";
                 MessageBox.Show("请设置坐标！","提示");
-                FloatLabel.Text = "金额：0";
+                floatForm.FloatLabel.Text = "金额:0";
                 ret = "{\"msg\":\"读取坐标失败!\",\"code\":500,\"data\":\"\"}";
+            }
+            if (!string.IsNullOrEmpty(ret))
+            {
+                ret = "{\"msg\":\"未读取到数据!\",\"code\":500,\"data\":\"\"}";
             }
             return ret;
             #endregion
         }
 
+
         private void Form1_Load(object sender, EventArgs e)
         {
             
-            label1.Text = "设置坐标个数：" + ReadZB.point.Count;
+            label1.Text = "设置坐标个数:" + ReadZB.point.Count;
             Interval = ConfigurationManager.AppSettings["Time"];
             timetext.Text = Interval;
             if (ReadZB.point.Count > 0)
@@ -198,32 +216,23 @@ namespace MyScreenPrint
             }
 
 
-            m_aeroEnabled = false;
+            
             System.Windows.Forms.Control.CheckForIllegalCrossThreadCalls = false;
             t.Elapsed += new System.Timers.ElapsedEventHandler(Timer_TimesUp);
             t.AutoReset = true; //每到指定时间Elapsed事件是触发一次（false），还是一直触发（true）
-            FloatForm.FormBorderStyle = FormBorderStyle.None;
-            FloatForm.TopMost = true;//设置窗口永远为屏幕前面
-            FloatForm.ShowInTaskbar = false;//不在任务栏中显示以免误关
-            FloatForm.Width=80;
-            FloatForm.Height = 30;
-            FloatForm.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
-            FloatForm.MaximizeBox = false;
-            FloatForm.MinimizeBox = false;
-            int x = (SystemInformation.WorkingArea.Width - FloatForm.Size.Width) / 2;
-            int y = (SystemInformation.WorkingArea.Height - FloatForm.Size.Height) / 2;
-            FloatForm.StartPosition = FormStartPosition.Manual; //窗体的位置由Location属性决定
-            FloatForm.Location = (Point)new Size(x, 0);         //窗体的起始位置为(x,y)
-            
-            FloatLabel.Location = new Point(0,10);
-            FloatLabel.AutoSize = true;
-            FloatLabel.Width = 78;
-            FloatLabel.Height = 28;
-            FloatLabel.Font= new Font(this.Font.FontFamily, 18);
 
-            FloatLabel.Text = "金额：0";
-            FloatForm.Controls.Add(FloatLabel);
-            FloatForm.Show();
+            floatForm.Show();
+
+            bool isStartService = bool.Parse(config.AppSettings.Settings["isStartService"].Value);
+            if (isStartService)
+            {
+                //最小化窗口
+                WindowState = FormWindowState.Minimized;
+                Thread.Sleep(200);
+                t.Enabled = true; //是否触发Elapsed事件
+                t.Start();
+                timebtn.Text = "停止";
+            }
         }
 
         private void Clean_Point_Click(object sender, EventArgs e)
@@ -239,7 +248,7 @@ namespace MyScreenPrint
             fs.Close();
             ReadZB.point.Clear();
             textBox1.Text = "";
-            label1.Text= "设置坐标个数：" + ReadZB.point.Count;
+            label1.Text= "设置坐标个数:" + ReadZB.point.Count;
             MessageBox.Show("已清空！");
         }
 
@@ -365,99 +374,125 @@ namespace MyScreenPrint
             textBox2.Text = "";
         }
 
-        [DllImport("Gdi32.dll", EntryPoint = "CreateRoundRectRgn")]
-        private static extern IntPtr CreateRoundRectRgn
-    (
-        int nLeftRect, // x-coordinate of upper-left corner
-        int nTopRect, // y-coordinate of upper-left corner
-        int nRightRect, // x-coordinate of lower-right corner
-        int nBottomRect, // y-coordinate of lower-right corner
-        int nWidthEllipse, // height of ellipse
-        int nHeightEllipse // width of ellipse
-     );
-
-        [DllImport("dwmapi.dll")]
-        public static extern int DwmExtendFrameIntoClientArea(IntPtr hWnd, ref MARGINS pMarInset);
-
-        [DllImport("dwmapi.dll")]
-        public static extern int DwmSetWindowAttribute(IntPtr hwnd, int attr, ref int attrValue, int attrSize);
-
-        [DllImport("dwmapi.dll")]
-        public static extern int DwmIsCompositionEnabled(ref int pfEnabled);
-
-        private bool m_aeroEnabled;                     // variables for box shadow
-        private const int CS_DROPSHADOW = 0x00020000;
-        private const int WM_NCPAINT = 0x0085;
-        private const int WM_ACTIVATEAPP = 0x001C;
-
-        public struct MARGINS                           // struct for box shadow
+        private void notifyIcon1_MouseDoubleClick(object sender, MouseEventArgs e)
         {
-            public int leftWidth;
-            public int rightWidth;
-            public int topHeight;
-            public int bottomHeight;
-        }
-
-        private const int WM_NCHITTEST = 0x84;          // variables for dragging the form
-        private const int HTCLIENT = 0x1;
-        private const int HTCAPTION = 0x2;
-
-        protected override CreateParams CreateParams
-        {
-            get
+            if (WindowState == FormWindowState.Minimized)
             {
-                m_aeroEnabled = CheckAeroEnabled();
-
-                CreateParams cp = base.CreateParams;
-                if (!m_aeroEnabled)
-                    cp.ClassStyle |= CS_DROPSHADOW;
-
-                return cp;
+                //还原窗体显示    
+                WindowState = FormWindowState.Normal;
+                //激活窗体并给予它焦点
+                this.Activate();
+                //任务栏区显示图标
+                this.ShowInTaskbar = true;
+                //托盘区图标隐藏
+                notifyIcon1.Visible = false;
             }
         }
 
-        private bool CheckAeroEnabled()
+        private void Form1_SizeChanged(object sender, EventArgs e)
         {
-            if (Environment.OSVersion.Version.Major >= 6)
+            //判断是否选择的是最小化按钮
+            if (WindowState == FormWindowState.Minimized)
             {
-                int enabled = 0;
-                DwmIsCompositionEnabled(ref enabled);
-                return (enabled == 1) ? true : false;
+                //隐藏任务栏区图标
+                this.ShowInTaskbar = false;
+                //图标显示在托盘区
+                notifyIcon1.Visible = true;
             }
-            return false;
         }
 
-        protected override void WndProc(ref Message m)
+        private void Form1_FormClosing(object sender, FormClosingEventArgs e)
         {
-            switch (m.Msg)
+            if (MessageBox.Show("是否确认退出程序？", "退出", MessageBoxButtons.OKCancel, MessageBoxIcon.Question) == DialogResult.OK)
             {
-                case WM_NCPAINT:                        // box shadow
-                    if (m_aeroEnabled)
-                    {
-                        var v = 2;
-                        DwmSetWindowAttribute(this.Handle, 2, ref v, 4);
-                        MARGINS margins = new MARGINS()
-                        {
-                            bottomHeight = 1,
-                            leftWidth = 1,
-                            rightWidth = 1,
-                            topHeight = 1
-                        };
-                        DwmExtendFrameIntoClientArea(this.Handle, ref margins);
-
-                    }
-                    break;
-                default:
-                    break;
+                // 关闭所有的线程
+                this.Dispose();
+                this.Close();
             }
-            base.WndProc(ref m);
-
-            if (m.Msg == WM_NCHITTEST && (int)m.Result == HTCLIENT)     // drag the form
-                m.Result = (IntPtr)HTCAPTION;
-
+            else
+            {
+                e.Cancel = true;
+            }
         }
 
+        private void 显示ToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            WindowState = FormWindowState.Normal;
+        }
 
+        private void 退出ToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (MessageBox.Show("是否确认退出程序？", "退出", MessageBoxButtons.OKCancel, MessageBoxIcon.Question) == DialogResult.OK)
+            {
+                // 关闭所有的线程
+                this.Dispose();
+                this.Close();
+            }
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            setting.FormClosing += setting_FormClosing;
+            setting.MaximizeBox = false;
+            setting.MinimizeBox = false;
+            setting.Height = 200;
+            setting.Width = 230;
+            setting.Text = "更多设置";
+            
+            isStartUp.CheckedChanged += isStartUp_CheckedChanged;
+            isStartUp.Checked = bool.Parse(config.AppSettings.Settings["isStartUp"].Value);
+            isStartUp.Text = "开机启动";
+            isStartUp.Location = new Point(50, 20);
+            setting.Controls.Add(isStartUp);
+
+
+            isStartService.CheckedChanged += isStartService_CheckedChanged;
+            isStartService.Checked = bool.Parse(config.AppSettings.Settings["isStartService"].Value);
+            isStartService.Text = "开机启动实时识别";
+            isStartService.AutoSize=true;
+            isStartService.Location = new Point(50, 60);
+            setting.Controls.Add(isStartService);
+            setting.Show();
+        }
+
+        private void isStartUp_CheckedChanged(object sender, EventArgs e)
+        {
+            if (isStartUp.Checked)
+            {
+                config.AppSettings.Settings["isStartUp"].Value = "true";
+                
+                RootClass.AutoStart(true);//开启开机启动
+            }
+            else
+            {
+                config.AppSettings.Settings["isStartUp"].Value = "false";
+                config.AppSettings.Settings["isStartService"].Value = "false";
+                isStartService.Checked = false;
+                RootClass.AutoStart(false);//关闭开机启动
+
+            }
+            config.Save(ConfigurationSaveMode.Modified);
+        }
+
+        private void isStartService_CheckedChanged(object sender, EventArgs e)
+        {
+            if (isStartService.Checked)
+            {
+                config.AppSettings.Settings["isStartService"].Value = "true";
+
+            }
+            else
+            {
+                config.AppSettings.Settings["isStartService"].Value = "false";
+            }
+            config.Save(ConfigurationSaveMode.Modified);
+        }
+
+        private void setting_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            setting.Visible = false;
+            e.Cancel = true;
+        }
     }
 
     public class PICResponse

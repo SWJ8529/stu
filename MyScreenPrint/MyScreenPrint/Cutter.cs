@@ -27,6 +27,8 @@ namespace MyScreenPrint
 
         // 确认按钮
         private Button OK_btn = null;
+        //取消按钮
+        private Button No_btn = null;
 
         // 截图窗口构造
         public Cutter() : base()
@@ -110,11 +112,23 @@ namespace MyScreenPrint
                 isCatchStart = false;
 
                 Update();
+
+                //防错判断如果长宽为0则默认为1
+                if (width==0)
+                {
+                    width = 1;
+                }
+                if (height == 0)
+                {
+                    height = 1;
+                }
                 // 保存图片到图片框
                 Bitmap bmp = new Bitmap(width, height);
                 Graphics g = Graphics.FromImage(bmp);
                 g.DrawImage(BackgroundImage, new Rectangle(0, 0, width, height), new Rectangle(rectX, rectY, width, height), GraphicsUnit.Pixel);
-                //Form1.catchBmp = bmp;
+
+
+
 
                 // 确定按钮
                 OK_btn = new Button();
@@ -122,32 +136,42 @@ namespace MyScreenPrint
                 OK_btn.Size = new Size(100, 50);
                 OK_btn.Text = "确认！";
                 OK_btn.Click += (sende, ee) => DialogResult = DialogResult.OK;
+                OK_btn.MouseClick+= OK_btn_Click;
                 Controls.Add(OK_btn);
 
-                
-
-                list.Add(rectX + "," + rectY + "," + width + "," + height);
-
-                rp.point = list;
-                rp.url= ReadZB._URL;
-
-                FileStream fs = new FileStream(ReadZB.FilePath, FileMode.Open, FileAccess.Write);
-                System.IO.File.SetAttributes(ReadZB.FilePath, FileAttributes.Hidden);
-                StreamWriter sr = new StreamWriter(fs);
-                sr.WriteLine(JsonConvert.SerializeObject(rp));//开始写入值
-                sr.Close();
-                fs.Close();
-                ReadZB.point = list;
-
+                // 取消按钮
+                No_btn = new Button();
+                No_btn.Location = new Point(e.X, e.Y-50);
+                No_btn.Size = new Size(100, 50);
+                No_btn.Text = "取消！";
+                No_btn.Click += (sende, ee) => DialogResult = DialogResult.OK;
+                Controls.Add(No_btn);
                 Update();
-
                 // 绘制矩形区域
                 Rectangle rect = new Rectangle(rectX, rectY, width, height);
                 Pen pen = new Pen(Color.Red, 5);
                 g = this.CreateGraphics();
-                g.DrawRectangle(pen, rect);
+                g.DrawRectangle(pen, rect);                       
             }
         }
+
+        private void OK_btn_Click(object sender, System.EventArgs e)
+        {
+            list.Add(rectX + "," + rectY + "," + width + "," + height);
+
+            rp.point = list;
+            rp.url = ReadZB._URL;
+
+            FileStream fs = new FileStream(ReadZB.FilePath, FileMode.Open, FileAccess.Write);
+            System.IO.File.SetAttributes(ReadZB.FilePath, FileAttributes.Hidden);
+            StreamWriter sr = new StreamWriter(fs);
+            sr.WriteLine(JsonConvert.SerializeObject(rp));//开始写入值
+            sr.Close();
+            fs.Close();
+            ReadZB.point = list;
+        }
+
+
         #endregion
 
 

@@ -29,25 +29,30 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
             this.operationPanel = new System.Windows.Forms.Panel();
+            this.timebtn = new System.Windows.Forms.Button();
+            this.label4 = new System.Windows.Forms.Label();
+            this.timetext = new System.Windows.Forms.TextBox();
             this.Clean_Point = new System.Windows.Forms.Button();
             this.label1 = new System.Windows.Forms.Label();
             this.button2 = new System.Windows.Forms.Button();
             this.printScrBtn = new System.Windows.Forms.Button();
             this.splitter_1 = new System.Windows.Forms.Label();
             this.picturePanel = new System.Windows.Forms.Panel();
+            this.cleanlog = new System.Windows.Forms.Button();
             this.label3 = new System.Windows.Forms.Label();
             this.textBox2 = new System.Windows.Forms.TextBox();
             this.label2 = new System.Windows.Forms.Label();
             this.textBox1 = new System.Windows.Forms.TextBox();
-            this.bindingSource1 = new System.Windows.Forms.BindingSource(this.components);
-            this.timetext = new System.Windows.Forms.TextBox();
-            this.label4 = new System.Windows.Forms.Label();
-            this.timebtn = new System.Windows.Forms.Button();
-            this.cleanlog = new System.Windows.Forms.Button();
+            this.notifyIcon1 = new System.Windows.Forms.NotifyIcon(this.components);
+            this.contextMenuStrip1 = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.显示ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.退出ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.button1 = new System.Windows.Forms.Button();
             this.operationPanel.SuspendLayout();
             this.picturePanel.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.bindingSource1)).BeginInit();
+            this.contextMenuStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
             // operationPanel
@@ -56,6 +61,7 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.operationPanel.BackColor = System.Drawing.SystemColors.ActiveCaption;
             this.operationPanel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.operationPanel.Controls.Add(this.button1);
             this.operationPanel.Controls.Add(this.timebtn);
             this.operationPanel.Controls.Add(this.label4);
             this.operationPanel.Controls.Add(this.timetext);
@@ -70,6 +76,32 @@
             this.operationPanel.Size = new System.Drawing.Size(113, 635);
             this.operationPanel.TabIndex = 1;
             // 
+            // timebtn
+            // 
+            this.timebtn.Location = new System.Drawing.Point(2, 276);
+            this.timebtn.Name = "timebtn";
+            this.timebtn.Size = new System.Drawing.Size(75, 23);
+            this.timebtn.TabIndex = 9;
+            this.timebtn.Text = "启动";
+            this.timebtn.UseVisualStyleBackColor = true;
+            this.timebtn.Click += new System.EventHandler(this.timebtn_Click);
+            // 
+            // label4
+            // 
+            this.label4.AutoSize = true;
+            this.label4.Location = new System.Drawing.Point(75, 252);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(29, 12);
+            this.label4.TabIndex = 8;
+            this.label4.Text = "毫秒";
+            // 
+            // timetext
+            // 
+            this.timetext.Location = new System.Drawing.Point(2, 249);
+            this.timetext.Name = "timetext";
+            this.timetext.Size = new System.Drawing.Size(67, 21);
+            this.timetext.TabIndex = 7;
+            // 
             // Clean_Point
             // 
             this.Clean_Point.Location = new System.Drawing.Point(2, 57);
@@ -83,7 +115,7 @@
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(3, 167);
+            this.label1.Location = new System.Drawing.Point(3, 234);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(41, 12);
             this.label1.TabIndex = 5;
@@ -95,7 +127,7 @@
             this.button2.Name = "button2";
             this.button2.Size = new System.Drawing.Size(102, 48);
             this.button2.TabIndex = 4;
-            this.button2.Text = "识别坐标";
+            this.button2.Text = "识别测试";
             this.button2.UseVisualStyleBackColor = true;
             this.button2.Click += new System.EventHandler(this.button2_Click);
             // 
@@ -134,6 +166,16 @@
             this.picturePanel.Name = "picturePanel";
             this.picturePanel.Size = new System.Drawing.Size(1056, 635);
             this.picturePanel.TabIndex = 2;
+            // 
+            // cleanlog
+            // 
+            this.cleanlog.Location = new System.Drawing.Point(5, 235);
+            this.cleanlog.Name = "cleanlog";
+            this.cleanlog.Size = new System.Drawing.Size(75, 23);
+            this.cleanlog.TabIndex = 10;
+            this.cleanlog.Text = "清空日志";
+            this.cleanlog.UseVisualStyleBackColor = true;
+            this.cleanlog.Click += new System.EventHandler(this.cleanlog_Click);
             // 
             // label3
             // 
@@ -178,41 +220,46 @@
             this.textBox1.Size = new System.Drawing.Size(1033, 184);
             this.textBox1.TabIndex = 0;
             // 
-            // timetext
+            // notifyIcon1
             // 
-            this.timetext.Location = new System.Drawing.Point(2, 182);
-            this.timetext.Name = "timetext";
-            this.timetext.Size = new System.Drawing.Size(67, 21);
-            this.timetext.TabIndex = 7;
+            this.notifyIcon1.ContextMenuStrip = this.contextMenuStrip1;
+            this.notifyIcon1.Icon = ((System.Drawing.Icon)(resources.GetObject("notifyIcon1.Icon")));
+            this.notifyIcon1.Text = "图片数字识别工具";
+            this.notifyIcon1.Visible = true;
+            this.notifyIcon1.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.notifyIcon1_MouseDoubleClick);
             // 
-            // label4
+            // contextMenuStrip1
             // 
-            this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(75, 185);
-            this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(29, 12);
-            this.label4.TabIndex = 8;
-            this.label4.Text = "毫秒";
+            this.contextMenuStrip1.ImageScalingSize = new System.Drawing.Size(24, 24);
+            this.contextMenuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.显示ToolStripMenuItem,
+            this.退出ToolStripMenuItem});
+            this.contextMenuStrip1.Name = "contextMenuStrip1";
+            this.contextMenuStrip1.Size = new System.Drawing.Size(101, 48);
             // 
-            // timebtn
+            // 显示ToolStripMenuItem
             // 
-            this.timebtn.Location = new System.Drawing.Point(5, 209);
-            this.timebtn.Name = "timebtn";
-            this.timebtn.Size = new System.Drawing.Size(75, 23);
-            this.timebtn.TabIndex = 9;
-            this.timebtn.Text = "启动";
-            this.timebtn.UseVisualStyleBackColor = true;
-            this.timebtn.Click += new System.EventHandler(this.timebtn_Click);
+            this.显示ToolStripMenuItem.Name = "显示ToolStripMenuItem";
+            this.显示ToolStripMenuItem.Size = new System.Drawing.Size(100, 22);
+            this.显示ToolStripMenuItem.Text = "显示";
+            this.显示ToolStripMenuItem.Click += new System.EventHandler(this.显示ToolStripMenuItem_Click);
             // 
-            // cleanlog
+            // 退出ToolStripMenuItem
             // 
-            this.cleanlog.Location = new System.Drawing.Point(5, 235);
-            this.cleanlog.Name = "cleanlog";
-            this.cleanlog.Size = new System.Drawing.Size(75, 23);
-            this.cleanlog.TabIndex = 10;
-            this.cleanlog.Text = "清空日志";
-            this.cleanlog.UseVisualStyleBackColor = true;
-            this.cleanlog.Click += new System.EventHandler(this.cleanlog_Click);
+            this.退出ToolStripMenuItem.Name = "退出ToolStripMenuItem";
+            this.退出ToolStripMenuItem.Size = new System.Drawing.Size(100, 22);
+            this.退出ToolStripMenuItem.Text = "退出";
+            this.退出ToolStripMenuItem.Click += new System.EventHandler(this.退出ToolStripMenuItem_Click);
+            // 
+            // button1
+            // 
+            this.button1.Location = new System.Drawing.Point(2, 170);
+            this.button1.Name = "button1";
+            this.button1.Size = new System.Drawing.Size(102, 48);
+            this.button1.TabIndex = 10;
+            this.button1.Text = "更多设置";
+            this.button1.UseVisualStyleBackColor = true;
+            this.button1.Click += new System.EventHandler(this.button1_Click);
             // 
             // Form1
             // 
@@ -223,12 +270,14 @@
             this.Controls.Add(this.operationPanel);
             this.Name = "Form1";
             this.Text = "图片数字识别工具";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Form1_FormClosing);
             this.Load += new System.EventHandler(this.Form1_Load);
+            this.SizeChanged += new System.EventHandler(this.Form1_SizeChanged);
             this.operationPanel.ResumeLayout(false);
             this.operationPanel.PerformLayout();
             this.picturePanel.ResumeLayout(false);
             this.picturePanel.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.bindingSource1)).EndInit();
+            this.contextMenuStrip1.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
@@ -237,7 +286,6 @@
         private System.Windows.Forms.Panel operationPanel;
         private System.Windows.Forms.Panel picturePanel;
         private System.Windows.Forms.Label splitter_1;
-        private System.Windows.Forms.BindingSource bindingSource1;
         private System.Windows.Forms.Button printScrBtn;
         private System.Windows.Forms.Button button2;
         private System.Windows.Forms.Label label1;
@@ -250,6 +298,11 @@
         private System.Windows.Forms.TextBox timetext;
         private System.Windows.Forms.Button timebtn;
         private System.Windows.Forms.Button cleanlog;
+        private System.Windows.Forms.NotifyIcon notifyIcon1;
+        private System.Windows.Forms.ContextMenuStrip contextMenuStrip1;
+        private System.Windows.Forms.ToolStripMenuItem 显示ToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem 退出ToolStripMenuItem;
+        private System.Windows.Forms.Button button1;
     }
 }
 
