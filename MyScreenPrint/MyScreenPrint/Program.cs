@@ -17,7 +17,7 @@ namespace MyScreenPrint
         [STAThread]
         static void Main()
         {
-            FileStream fs = new FileStream(Environment.CurrentDirectory+@"\test.txt", FileMode.Open, FileAccess.Write);
+            FileStream fs = new FileStream(Environment.CurrentDirectory+@"\log.txt", FileMode.Open, FileAccess.Write);
             StreamWriter sr = new StreamWriter(fs);
             try
             {
@@ -34,12 +34,6 @@ namespace MyScreenPrint
                     HandleRunningInstance(instance);
                     return;
                 }
-
-                //////判断是否需要开机启动
-                //Configuration config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
-                //bool isStartUp = bool.Parse(config.AppSettings.Settings["isStartUp"].Value);
-                //RootClass.AutoStart(isStartUp);
-
                 ReadZB zb = new ReadZB();
                 zb.readpoint();
                 sr.WriteLine("开机启动！");//开始写入值

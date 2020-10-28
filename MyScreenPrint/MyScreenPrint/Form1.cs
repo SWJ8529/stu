@@ -167,7 +167,8 @@ namespace MyScreenPrint
                     {
                         try
                         {
-                            decimal.Parse(pir.data);//尝试将内容转为数字
+                            //尝试将内容转为数字
+                            if (decimal.Parse(pir.data) != 0) break;
                             ret = JsonConvert.SerializeObject(pir);
                             floatForm.FloatLabel.Text = "金额:" + pir.data;
                             break;//跳出循环
