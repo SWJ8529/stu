@@ -17,8 +17,6 @@ namespace MyScreenPrint
         [STAThread]
         static void Main()
         {
-            FileStream fs = new FileStream(Environment.CurrentDirectory+@"\log.txt", FileMode.Open, FileAccess.Write);
-            StreamWriter sr = new StreamWriter(fs);
             try
             {
                 //0106add  一次打开一个应用程序
@@ -34,20 +32,15 @@ namespace MyScreenPrint
                     HandleRunningInstance(instance);
                     return;
                 }
+                //RootClass.ShortcutAndStartup();
                 ReadZB zb = new ReadZB();
                 zb.readpoint();
-                sr.WriteLine("开机启动！");//开始写入值
                 Application.EnableVisualStyles();
                 Application.SetCompatibleTextRenderingDefault(false);                                                            
                 Application.Run(new Form1());
             }catch(Exception ex)
             {
-                sr.WriteLine(ex.ToString());//开始写入值
-            }
-            finally
-            {
-                sr.Close();
-                fs.Close();
+                MessageBox.Show("程序启动失败！"+ex.ToString());
             }
         }
 

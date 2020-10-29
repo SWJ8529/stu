@@ -132,12 +132,14 @@ namespace MyScreenPrint
             g1.ReleaseHdc(dc3);
             g2.ReleaseHdc(dc2);
 
+            int i = 0;
 
             #region 获取坐标
             if (ReadZB.point.Count > 0)
             {
                 foreach (string line in ReadZB.point)
                 {
+                    i++;
                     rectX = Convert.ToInt32(line.Split(',')[0]);
                     rectY = Convert.ToInt32(line.Split(',')[1]);
                     width = Convert.ToInt32(line.Split(',')[2]);
@@ -163,25 +165,27 @@ namespace MyScreenPrint
                     textBox2.Text += //string.IsNullOrEmpty(pir.data) ?"该坐标无法识别出数字:"+ line+"   ": 
                         DateTime.Now.ToString()+" : "+response + "\r\n";
                     ms.Close();
-                    if (!string.IsNullOrEmpty(pir.data))//判断是否为空
+                    try
                     {
-                        try
+                        if (!string.IsNullOrEmpty(pir.data) && decimal.Parse(pir.data) != 0)//判断是否为空
                         {
-                            //尝试将内容转为数字
-                            if (decimal.Parse(pir.data) != 0) break;
-                            ret = JsonConvert.SerializeObject(pir);
-                            floatForm.FloatLabel.Text = "金额:" + pir.data;
-                            break;//跳出循环
-                        }
-                        catch (Exception ex)
-                        {
-                            continue;//继续循环
-                        }
+                        
+                                //尝试将内容转为数字
+                                //if (decimal.Parse(pir.data) == 0) { continue; }
+                                ret = JsonConvert.SerializeObject(pir);
+                                floatForm.FloatLabel.Text = "金额:" + pir.data;
+                                break;//跳出循环
+                        
 
+                        }
+                        if (i== ReadZB.point.Count && string.IsNullOrEmpty(pir.data))//如果是最后一个坐标并且还没数据
+                        {
+                            floatForm.FloatLabel.Text = "金额:0";
+                        }
                     }
-                    else
+                    catch (Exception ex)
                     {
-                        floatForm.FloatLabel.Text = "金额:0";
+                        continue;//继续循环
                     }
                 }
                 textBox2.Text += "\r\n";
@@ -193,7 +197,7 @@ namespace MyScreenPrint
                 floatForm.FloatLabel.Text = "金额:0";
                 ret = "{\"msg\":\"读取坐标失败!\",\"code\":500,\"data\":\"\"}";
             }
-            if (!string.IsNullOrEmpty(ret))
+            if (string.IsNullOrEmpty(ret))
             {
                 ret = "{\"msg\":\"未读取到数据!\",\"code\":500,\"data\":\"\"}";
             }
@@ -462,14 +466,14 @@ namespace MyScreenPrint
             {
                 config.AppSettings.Settings["isStartUp"].Value = "true";
                 
-                RootClass.AutoStart(true);//开启开机启动
+                RootClass.ShortcutAndStartup(true);//开启开机启动
             }
             else
             {
                 config.AppSettings.Settings["isStartUp"].Value = "false";
                 config.AppSettings.Settings["isStartService"].Value = "false";
                 isStartService.Checked = false;
-                RootClass.AutoStart(false);//关闭开机启动
+                RootClass.ShortcutAndStartup(false);//关闭开机启动
 
             }
             config.Save(ConfigurationSaveMode.Modified);
