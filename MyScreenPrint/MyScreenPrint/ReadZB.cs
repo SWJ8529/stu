@@ -14,6 +14,7 @@ namespace MyScreenPrint
         public static List<string> point = new List<string>();
         public static string FilePath = "";
         public static string _URL = "";
+        public string cs;
         public void readpoint()
         {
             FilePath = Environment.CurrentDirectory.Substring(0, Environment.CurrentDirectory.IndexOf('\\')) + @"/Point.txt";
