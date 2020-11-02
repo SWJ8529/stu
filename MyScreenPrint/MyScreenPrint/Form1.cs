@@ -35,8 +35,6 @@ namespace MyScreenPrint
 
         // 绘图参数
         enum Tools { Pen, Text};
-        Graphics catchBmpGraphics = null;  // 图形设备
-        Color color = Color.White;  // 选择的颜色
 
         public Form1()
         {
