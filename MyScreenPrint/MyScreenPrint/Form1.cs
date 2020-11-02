@@ -203,6 +203,7 @@ namespace MyScreenPrint
             g2.Dispose();
             my.Dispose();
             GC.Collect();
+            GC.GetTotalMemory(true);
             return ret;
             #endregion
         }
