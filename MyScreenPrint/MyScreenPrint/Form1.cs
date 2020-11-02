@@ -440,7 +440,7 @@ namespace MyScreenPrint
             setting.MaximizeBox = false;
             setting.MinimizeBox = false;
             setting.Height = 200;
-            setting.Width = 230;
+            setting.Width = 250;
             setting.Text = "更多设置";
             
             isStartUp.CheckedChanged += isStartUp_CheckedChanged;
@@ -452,7 +452,7 @@ namespace MyScreenPrint
 
             isStartService.CheckedChanged += isStartService_CheckedChanged;
             isStartService.Checked = bool.Parse(config.AppSettings.Settings["isStartService"].Value);
-            isStartService.Text = "开机启动实时识别";
+            isStartService.Text = "程序启动时开启实时识别";
             isStartService.AutoSize=true;
             isStartService.Location = new Point(50, 60);
             setting.Controls.Add(isStartService);
