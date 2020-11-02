@@ -31,6 +31,7 @@
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
             this.operationPanel = new System.Windows.Forms.Panel();
+            this.button1 = new System.Windows.Forms.Button();
             this.timebtn = new System.Windows.Forms.Button();
             this.label4 = new System.Windows.Forms.Label();
             this.timetext = new System.Windows.Forms.TextBox();
@@ -40,16 +41,12 @@
             this.printScrBtn = new System.Windows.Forms.Button();
             this.splitter_1 = new System.Windows.Forms.Label();
             this.picturePanel = new System.Windows.Forms.Panel();
-            this.cleanlog = new System.Windows.Forms.Button();
-            this.label3 = new System.Windows.Forms.Label();
-            this.textBox2 = new System.Windows.Forms.TextBox();
             this.label2 = new System.Windows.Forms.Label();
             this.textBox1 = new System.Windows.Forms.TextBox();
             this.notifyIcon1 = new System.Windows.Forms.NotifyIcon(this.components);
             this.contextMenuStrip1 = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.显示ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.退出ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.button1 = new System.Windows.Forms.Button();
             this.operationPanel.SuspendLayout();
             this.picturePanel.SuspendLayout();
             this.contextMenuStrip1.SuspendLayout();
@@ -71,10 +68,20 @@
             this.operationPanel.Controls.Add(this.printScrBtn);
             this.operationPanel.Controls.Add(this.splitter_1);
             this.operationPanel.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.operationPanel.Location = new System.Drawing.Point(1075, 12);
+            this.operationPanel.Location = new System.Drawing.Point(443, 12);
             this.operationPanel.Name = "operationPanel";
-            this.operationPanel.Size = new System.Drawing.Size(113, 635);
+            this.operationPanel.Size = new System.Drawing.Size(113, 316);
             this.operationPanel.TabIndex = 1;
+            // 
+            // button1
+            // 
+            this.button1.Location = new System.Drawing.Point(2, 170);
+            this.button1.Name = "button1";
+            this.button1.Size = new System.Drawing.Size(102, 48);
+            this.button1.TabIndex = 10;
+            this.button1.Text = "更多设置";
+            this.button1.UseVisualStyleBackColor = true;
+            this.button1.Click += new System.EventHandler(this.button1_Click);
             // 
             // timebtn
             // 
@@ -157,46 +164,12 @@
             this.picturePanel.AutoScroll = true;
             this.picturePanel.BackColor = System.Drawing.SystemColors.ActiveCaption;
             this.picturePanel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.picturePanel.Controls.Add(this.cleanlog);
-            this.picturePanel.Controls.Add(this.label3);
-            this.picturePanel.Controls.Add(this.textBox2);
             this.picturePanel.Controls.Add(this.label2);
             this.picturePanel.Controls.Add(this.textBox1);
             this.picturePanel.Location = new System.Drawing.Point(13, 12);
             this.picturePanel.Name = "picturePanel";
-            this.picturePanel.Size = new System.Drawing.Size(1056, 635);
+            this.picturePanel.Size = new System.Drawing.Size(424, 316);
             this.picturePanel.TabIndex = 2;
-            // 
-            // cleanlog
-            // 
-            this.cleanlog.Location = new System.Drawing.Point(5, 235);
-            this.cleanlog.Name = "cleanlog";
-            this.cleanlog.Size = new System.Drawing.Size(75, 23);
-            this.cleanlog.TabIndex = 10;
-            this.cleanlog.Text = "清空日志";
-            this.cleanlog.UseVisualStyleBackColor = true;
-            this.cleanlog.Click += new System.EventHandler(this.cleanlog_Click);
-            // 
-            // label3
-            // 
-            this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(3, 261);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(59, 12);
-            this.label3.TabIndex = 3;
-            this.label3.Text = "识别日志:";
-            // 
-            // textBox2
-            // 
-            this.textBox2.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.textBox2.Location = new System.Drawing.Point(3, 276);
-            this.textBox2.Multiline = true;
-            this.textBox2.Name = "textBox2";
-            this.textBox2.ScrollBars = System.Windows.Forms.ScrollBars.Both;
-            this.textBox2.Size = new System.Drawing.Size(1035, 354);
-            this.textBox2.TabIndex = 2;
             // 
             // label2
             // 
@@ -211,13 +184,14 @@
             // 
             // textBox1
             // 
-            this.textBox1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            this.textBox1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.textBox1.Location = new System.Drawing.Point(3, 32);
             this.textBox1.Multiline = true;
             this.textBox1.Name = "textBox1";
             this.textBox1.ScrollBars = System.Windows.Forms.ScrollBars.Both;
-            this.textBox1.Size = new System.Drawing.Size(1033, 184);
+            this.textBox1.Size = new System.Drawing.Size(416, 279);
             this.textBox1.TabIndex = 0;
             // 
             // notifyIcon1
@@ -251,21 +225,11 @@
             this.退出ToolStripMenuItem.Text = "退出";
             this.退出ToolStripMenuItem.Click += new System.EventHandler(this.退出ToolStripMenuItem_Click);
             // 
-            // button1
-            // 
-            this.button1.Location = new System.Drawing.Point(2, 170);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(102, 48);
-            this.button1.TabIndex = 10;
-            this.button1.Text = "更多设置";
-            this.button1.UseVisualStyleBackColor = true;
-            this.button1.Click += new System.EventHandler(this.button1_Click);
-            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1193, 659);
+            this.ClientSize = new System.Drawing.Size(561, 340);
             this.Controls.Add(this.picturePanel);
             this.Controls.Add(this.operationPanel);
             this.Name = "Form1";
@@ -291,13 +255,10 @@
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.TextBox textBox1;
-        private System.Windows.Forms.Label label3;
-        private System.Windows.Forms.TextBox textBox2;
         private System.Windows.Forms.Button Clean_Point;
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.TextBox timetext;
         private System.Windows.Forms.Button timebtn;
-        private System.Windows.Forms.Button cleanlog;
         private System.Windows.Forms.NotifyIcon notifyIcon1;
         private System.Windows.Forms.ContextMenuStrip contextMenuStrip1;
         private System.Windows.Forms.ToolStripMenuItem 显示ToolStripMenuItem;

@@ -8,7 +8,7 @@ using System.Windows.Forms;
 namespace MyScreenPrint
 {
     public class RootClass
-    {23233
+    {
 
         ///// <summary>
         ///// 修改程序在注册表中的键值

@@ -162,9 +162,9 @@ namespace MyScreenPrint
                     //BytesToImage(picdata);
                     string response = CreatePostData(ReadZB._URL, DateTime.Now.ToFileTime().ToString(), picdata);
                     PICResponse pir = JsonConvert.DeserializeObject<PICResponse>(response);
-                    textBox2.Text += //string.IsNullOrEmpty(pir.data) ?"该坐标无法识别出数字:"+ line+"   ": 
-                        DateTime.Now.ToString()+" : "+response + "\r\n";
                     ms.Close();
+                    g.Dispose();
+                    bmp.Dispose();
                     try
                     {
                         if (!string.IsNullOrEmpty(pir.data) && decimal.Parse(pir.data) != 0)//判断是否为空
@@ -188,7 +188,6 @@ namespace MyScreenPrint
                         continue;//继续循环
                     }
                 }
-                textBox2.Text += "\r\n";
             }
             else {
                 t.Stop();
@@ -201,6 +200,10 @@ namespace MyScreenPrint
             {
                 ret = "{\"msg\":\"未读取到数据!\",\"code\":500,\"data\":\"\"}";
             }
+
+            g1.Dispose();
+            g2.Dispose();
+            my.Dispose();
             return ret;
             #endregion
         }
@@ -372,11 +375,6 @@ namespace MyScreenPrint
             //到达指定时间截取屏幕指定区域并且识别内容
                       
             SaveImg();
-        }
-
-        private void cleanlog_Click(object sender, EventArgs e)
-        {
-            textBox2.Text = "";
         }
 
         private void notifyIcon1_MouseDoubleClick(object sender, MouseEventArgs e)
