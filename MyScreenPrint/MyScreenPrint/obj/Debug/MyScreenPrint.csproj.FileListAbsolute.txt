@@ -76,7 +76,6 @@ C:\Users\Administrator\Source\Repos\stu\MyScreenPrint\MyScreenPrint\bin\Debug\�
 C:\Users\Administrator\Source\Repos\stu\MyScreenPrint\MyScreenPrint\bin\Debug\图片识别插件.pdb
 C:\Users\Administrator\Source\Repos\stu\MyScreenPrint\MyScreenPrint\bin\Debug\Newtonsoft.Json.dll
 C:\Users\Administrator\Source\Repos\stu\MyScreenPrint\MyScreenPrint\bin\Debug\Newtonsoft.Json.xml
-C:\Users\Administrator\Source\Repos\stu\MyScreenPrint\MyScreenPrint\obj\Debug\MyScreenPrint.csprojAssemblyReference.cache
 C:\Users\Administrator\Source\Repos\stu\MyScreenPrint\MyScreenPrint\obj\Debug\Interop.IWshRuntimeLibrary.dll
 C:\Users\Administrator\Source\Repos\stu\MyScreenPrint\MyScreenPrint\obj\Debug\MyScreenPrint.csproj.ResolveComReference.cache
 C:\Users\Administrator\Source\Repos\stu\MyScreenPrint\MyScreenPrint\obj\Debug\MyScreenPrint.Cutter.resources
