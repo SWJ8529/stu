@@ -231,7 +231,7 @@ namespace MyScreenPrint
             t.Elapsed += new System.Timers.ElapsedEventHandler(Timer_TimesUp);
             t.AutoReset = true; //每到指定时间Elapsed事件是触发一次（false），还是一直触发（true）
 
-            //floatForm.Show();
+            floatForm.Show();
 
             bool isStartService = bool.Parse(config.AppSettings.Settings["isStartService"].Value);
             if (isStartService)
