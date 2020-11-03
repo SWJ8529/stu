@@ -115,7 +115,6 @@ namespace MyScreenPrint
 
         private void FloatForm_Load(object sender, EventArgs e)
         {
-            this.FormBorderStyle = FormBorderStyle.None;
             this.TopMost = true;//设置窗口永远为屏幕前面
             this.ShowInTaskbar = false;//不在任务栏中显示以免误关
             this.Width = 150;

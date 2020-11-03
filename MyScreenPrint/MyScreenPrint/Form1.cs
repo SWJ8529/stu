@@ -14,8 +14,11 @@ namespace MyScreenPrint
 {
     public partial class Form1 : Form
     {
+        public Label FloatLabel = new Label();//创建悬浮窗上的文本
 
-        FloatForm floatForm = new FloatForm();//创建悬浮窗
+        Form floatFormNew = new Form();
+
+        //FloatForm floatForm = new FloatForm();//创建悬浮窗
 
         CheckBox isStartUp = new CheckBox();//创建开机启动按钮
 
@@ -41,7 +44,8 @@ namespace MyScreenPrint
         public Form1()
         {
             InitializeComponent();
-
+            floatFormNew.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
+            floatFormNew.BackColor = Color.LightGoldenrodYellow;
             // 双缓冲
             this.SetStyle(ControlStyles.DoubleBuffer | ControlStyles.UserPaint |
                            ControlStyles.AllPaintingInWmPaint,
@@ -176,18 +180,21 @@ namespace MyScreenPrint
                                 //尝试将内容转为数字
                                 //if (decimal.Parse(pir.data) == 0) { continue; }
                                 ret = JsonConvert.SerializeObject(pir);
-                                floatForm.FloatLabel.Text = "金额:" + pir.data;
+                                //floatForm.FloatLabel.Text = "金额:" + pir.data;
+                                FloatLabel.Text = "金额:" + pir.data;
                                 break;//跳出循环
 
 
                             }
                             if (i == ReadZB.point.Count && string.IsNullOrEmpty(pir.data))//如果是最后一个坐标并且还没数据
                             {
-                                floatForm.FloatLabel.Text = "金额:0";
+                                //floatForm.FloatLabel.Text = "金额:0";
+                                FloatLabel.Text = "金额:0";
                             }
                         }
                         catch (Exception ex)
                         {
+                            Log.Save(ex.ToString());
                             continue;//继续循环
                         }
                     }
@@ -197,7 +204,8 @@ namespace MyScreenPrint
                     t.Stop();
                     timebtn.Text = "启动";
                     MessageBox.Show("请设置坐标！", "提示");
-                    floatForm.FloatLabel.Text = "金额:0";
+                    //floatForm.FloatLabel.Text = "金额:0";
+                    FloatLabel.Text = "金额:0";
                     ret = "{\"msg\":\"读取坐标失败!\",\"code\":500,\"data\":\"\"}";
                 }
                 if (string.IsNullOrEmpty(ret))
@@ -221,6 +229,7 @@ namespace MyScreenPrint
                 t.Enabled = true; //是否触发Elapsed事件
                 t.Start();
                 timebtn.Text = "停止";
+                Log.Save(ex.ToString());
             }
             return ret;
             #endregion
@@ -243,11 +252,35 @@ namespace MyScreenPrint
 
 
             
-            System.Windows.Forms.Control.CheckForIllegalCrossThreadCalls = false;
+            //System.Windows.Forms.Control.CheckForIllegalCrossThreadCalls = false;
             t.Elapsed += new System.Timers.ElapsedEventHandler(Timer_TimesUp);
             t.AutoReset = true; //每到指定时间Elapsed事件是触发一次（false），还是一直触发（true）
 
-            floatForm.Show();
+            
+            floatFormNew.TopMost = true;//设置窗口永远为屏幕前面
+            floatFormNew.ShowInTaskbar = false;//不在任务栏中显示以免误关
+            floatFormNew.Width = 150;
+            floatFormNew.Height = 40;
+
+            floatFormNew.MaximizeBox = false;
+            floatFormNew.MinimizeBox = false;
+            int x = (SystemInformation.WorkingArea.Width - floatFormNew.Size.Width) / 2;
+            int y = (SystemInformation.WorkingArea.Height - floatFormNew.Size.Height) / 2;
+            floatFormNew.StartPosition = FormStartPosition.Manual; //窗体的位置由Location属性决定
+            floatFormNew.Location = (Point)new Size(x, 0);         //窗体的起始位置为(x,y)
+
+
+
+            FloatLabel.Location = new Point(0, 10);
+            FloatLabel.AutoSize = true;
+            FloatLabel.Font = new Font(floatFormNew.Font.FontFamily, 13);
+
+            FloatLabel.Text = "金额:0";
+            floatFormNew.Controls.Add(FloatLabel);
+
+
+            floatFormNew.Show();
+            //floatForm.Show();
 
             bool isStartService = bool.Parse(config.AppSettings.Settings["isStartService"].Value);
             if (isStartService)
@@ -383,6 +416,7 @@ namespace MyScreenPrint
                 }
             }catch(Exception ex)
             {
+                Log.Save(ex.ToString());
                 MessageBox.Show(ex.ToString(),"警告！");
             }
             
@@ -457,7 +491,7 @@ namespace MyScreenPrint
             setting.MaximizeBox = false;
             setting.MinimizeBox = false;
             setting.Height = 200;
-            setting.Width = 230;
+            setting.Width = 250;
             setting.Text = "更多设置";
             
             isStartUp.CheckedChanged += isStartUp_CheckedChanged;
@@ -469,7 +503,7 @@ namespace MyScreenPrint
 
             isStartService.CheckedChanged += isStartService_CheckedChanged;
             isStartService.Checked = bool.Parse(config.AppSettings.Settings["isStartService"].Value);
-            isStartService.Text = "开机启动实时识别";
+            isStartService.Text = "启动时开启实时识别";
             isStartService.AutoSize=true;
             isStartService.Location = new Point(50, 60);
             setting.Controls.Add(isStartService);
