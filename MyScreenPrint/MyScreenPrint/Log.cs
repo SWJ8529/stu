@@ -15,12 +15,11 @@ namespace MyScreenPrint
             {
                 File.Create(FilePath).Close();
             }
-            FileStream fs = new FileStream(ReadZB.FilePath, FileMode.Open, FileAccess.Write);
+            FileStream fs = new FileStream(FilePath, FileMode.Open, FileAccess.Write);
             StreamWriter sr = new StreamWriter(fs);
-            fs.Seek(0, SeekOrigin.Begin);
-            fs.SetLength(0);
-            ReadZB.point.Clear();
+            sr.WriteLine("================================================");//开始写入值
             sr.WriteLine(DateTime.Now.ToString()+":  "+text);//开始写入值
+            sr.WriteLine("================================================");//开始写入值
             sr.Close();
             fs.Close();
         }

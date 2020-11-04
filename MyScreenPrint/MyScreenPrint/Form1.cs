@@ -216,7 +216,8 @@ namespace MyScreenPrint
                 g1.Dispose();
                 g2.Dispose();
                 my.Dispose();
-                GC.Collect();                
+                GC.Collect();
+                SystemMemeoryCleanup.ClearMemory();//清理缓存
             }
             catch(Exception ex)
             {
