@@ -29,7 +29,6 @@ namespace MyScreenPrint
 
         Configuration config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
         static String Interval;//定时时间
-        System.Timers.Timer t= new System.Timers.Timer();
         // 截图窗口
         Cutter cutter = null;
 
@@ -123,12 +122,19 @@ namespace MyScreenPrint
         public static extern IntPtr CreateDC(string lpszDriver, string lpszDevice, string lpszoutput, IntPtr lpdate);
         [DllImport("gdi32.dll")]
         public static extern BootMode BitBlt(IntPtr hdcDest, int x, int y, int widht, int hight, IntPtr hdcsrc, int xsrc, int ysrc, System.Int32 dw);
+        //声明一个委托对象
+        public delegate void Action2<in T>(T t);
+
+        public void changeLabelText(string text)
+        {
+            FloatLabel.Text = "金额:" + text;
+        }
         public string SaveImg(Boolean flag=false)
         {
+            Action2<string> action2 = new Action2<string>(changeLabelText);
             string ret = string.Empty;
             try
-            {
-                
+            {      
                 IntPtr dc1 = CreateDC("display", null, null, (IntPtr)null);
                 Graphics g1 = Graphics.FromHdc(dc1);
                 Bitmap my = new Bitmap(Screen.PrimaryScreen.Bounds.Width, Screen.PrimaryScreen.Bounds.Height, g1);
@@ -146,6 +152,7 @@ namespace MyScreenPrint
                 {
                     foreach (string line in ReadZB.point)
                     {
+                        
                         i++;
                         rectX = Convert.ToInt32(line.Split(',')[0]);
                         rectY = Convert.ToInt32(line.Split(',')[1]);
@@ -176,12 +183,9 @@ namespace MyScreenPrint
                         {
                             if (!string.IsNullOrEmpty(pir.data) && decimal.Parse(pir.data) != 0)//判断是否为空
                             {
-
-                                //尝试将内容转为数字
-                                //if (decimal.Parse(pir.data) == 0) { continue; }
                                 ret = JsonConvert.SerializeObject(pir);
-                                //floatForm.FloatLabel.Text = "金额:" + pir.data;
-                                FloatLabel.Text = "金额:" + pir.data;
+                                Invoke(action2, pir.data);
+                                //FloatLabel.Text = "金额:" + pir.data;
                                 break;//跳出循环
 
 
@@ -189,7 +193,8 @@ namespace MyScreenPrint
                             if (i == ReadZB.point.Count && string.IsNullOrEmpty(pir.data))//如果是最后一个坐标并且还没数据
                             {
                                 //floatForm.FloatLabel.Text = "金额:0";
-                                FloatLabel.Text = "金额:0";
+                                //FloatLabel.Text = "金额:0";
+                                Invoke(action2, "0");
                             }
                         }
                         catch (Exception ex)
@@ -201,11 +206,13 @@ namespace MyScreenPrint
                 }
                 else
                 {
-                    t.Stop();
+                    //取消执行
+                    backgroundWorker1.WorkerSupportsCancellation = true;
+                    backgroundWorker1.CancelAsync();
                     timebtn.Text = "启动";
                     MessageBox.Show("请设置坐标！", "提示");
-                    //floatForm.FloatLabel.Text = "金额:0";
-                    FloatLabel.Text = "金额:0";
+                    //FloatLabel.Text = "金额:0";
+                    Invoke(action2, "0");
                     ret = "{\"msg\":\"读取坐标失败!\",\"code\":500,\"data\":\"\"}";
                 }
                 if (string.IsNullOrEmpty(ret))
@@ -217,19 +224,13 @@ namespace MyScreenPrint
                 g2.Dispose();
                 my.Dispose();
                 GC.Collect();
-                SystemMemeoryCleanup.ClearMemory();//清理缓存
+                //SystemMemeoryCleanup.ClearMemory();//清理缓存(类似360加速球的效果)
             }
             catch(Exception ex)
             {
                 //如果出现异常清除缓存重新开始
                 GC.Collect();
-                SystemMemeoryCleanup.ClearMemory();//清理缓存
-                t.Stop();
-                timebtn.Text = "启动";
-                Thread.Sleep(200);
-                t.Enabled = true; //是否触发Elapsed事件
-                t.Start();
-                timebtn.Text = "停止";
+                SystemMemeoryCleanup.ClearMemory();//清理缓存(类似360加速球的效果)
                 Log.Save(ex.ToString());
             }
             return ret;
@@ -250,12 +251,6 @@ namespace MyScreenPrint
                     textBox1.Text += line+"\r\n";
                 }
             }
-
-
-            
-            //System.Windows.Forms.Control.CheckForIllegalCrossThreadCalls = false;
-            t.Elapsed += new System.Timers.ElapsedEventHandler(Timer_TimesUp);
-            t.AutoReset = true; //每到指定时间Elapsed事件是触发一次（false），还是一直触发（true）
 
             
             floatFormNew.TopMost = true;//设置窗口永远为屏幕前面
@@ -289,8 +284,12 @@ namespace MyScreenPrint
                 //最小化窗口
                 WindowState = FormWindowState.Minimized;
                 Thread.Sleep(200);
-                t.Enabled = true; //是否触发Elapsed事件
-                t.Start();
+                //防止重复执行
+                if (backgroundWorker1.IsBusy)
+                {
+                    return;
+                }
+                backgroundWorker1.RunWorkerAsync();
                 timebtn.Text = "停止";
             }
         }
@@ -391,44 +390,37 @@ namespace MyScreenPrint
         }
         private void timebtn_Click(object sender, EventArgs e)
         {
-            try
+            //更新定时时间
+            if (string.IsNullOrEmpty(Interval) || !Interval.Equals(timetext.Text))
             {
-                if (string.IsNullOrEmpty(Interval) || !Interval.Equals(timetext.Text))
-                {
-                    Configuration config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
-                    config.AppSettings.Settings["Time"].Value = timetext.Text;
-                    config.Save(ConfigurationSaveMode.Modified);
-                    Interval = timetext.Text;
-                }
-                t.Interval = Convert.ToDouble(Interval);
-                if (timebtn.Text == "启动")
-                {
-                    //最小化窗口
-                    WindowState = FormWindowState.Minimized;
-                    Thread.Sleep(200);
-                    t.Enabled = true; //是否触发Elapsed事件
-                    t.Start();
-                    timebtn.Text = "停止";
-                }
-                else
-                {
-                    t.Stop();
-                    timebtn.Text = "启动";
-                }
-            }catch(Exception ex)
-            {
-                Log.Save(ex.ToString());
-                MessageBox.Show(ex.ToString(),"警告！");
+                Configuration config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
+                config.AppSettings.Settings["Time"].Value = timetext.Text;
+                config.Save(ConfigurationSaveMode.Modified);
+                Interval = timetext.Text;
             }
+            if (timebtn.Text == "启动")
+            {
+                //最小化窗口
+                WindowState = FormWindowState.Minimized;
+                //防止重复执行
+                if (backgroundWorker1.IsBusy)
+                {
+                    return;
+                }
+                backgroundWorker1.RunWorkerAsync();
+                timebtn.Text = "停止";
+            }
+            else
+            {
+                //取消执行
+                backgroundWorker1.WorkerSupportsCancellation = true;
+                backgroundWorker1.CancelAsync();
+                timebtn.Text = "启动";
+            }
+            return;
             
         }
 
-        private void Timer_TimesUp(object sender, System.Timers.ElapsedEventArgs e)
-        {
-            //到达指定时间截取屏幕指定区域并且识别内容
-                      
-            SaveImg();
-        }
 
         private void notifyIcon1_MouseDoubleClick(object sender, MouseEventArgs e)
         {
@@ -548,6 +540,20 @@ namespace MyScreenPrint
         {
             setting.Visible = false;
             e.Cancel = true;
+        }
+
+        private void backgroundWorker1_DoWork(object sender, System.ComponentModel.DoWorkEventArgs e)
+        {
+            while (true)
+            {
+                // 判断是否执行取消操作
+                if (backgroundWorker1.CancellationPending)
+                {
+                    return;
+                }
+                Thread.Sleep(int.Parse(Interval));
+                SaveImg(false);
+            }
         }
     }
 

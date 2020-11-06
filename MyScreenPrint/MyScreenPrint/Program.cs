@@ -32,11 +32,32 @@ namespace MyScreenPrint
                     HandleRunningInstance(instance);
                     return;
                 }
-                //RootClass.ShortcutAndStartup();
                 ReadZB zb = new ReadZB();
                 zb.readpoint();
                 Application.EnableVisualStyles();
-                Application.SetCompatibleTextRenderingDefault(false);                                                            
+                Application.SetCompatibleTextRenderingDefault(false);
+
+                #region 异常处理
+                //应用程序处理异常方式
+                Application.SetUnhandledExceptionMode(UnhandledExceptionMode.ThrowException);
+                //当未捕获线程异常时,进行如下处理
+                Application.ThreadException += (sender, e) =>
+                {
+                    Log.Save(e.ToString());
+                    MessageBox.Show("程序运行错误:" + e.Exception.Message);
+                };
+                //当异常未捕获时进行如下处理
+                AppDomain.CurrentDomain.UnhandledException += (sender, e) =>
+                {
+                    if (e.ExceptionObject is System.Exception)
+                    {
+                        System.Exception exc = e.ExceptionObject as System.Exception;
+                        Log.Save(e.ToString());
+                        MessageBox.Show("程序运行错误:" + exc.Message);
+                    }
+                };
+                #endregion
+
                 Application.Run(new Form1());
             }catch(Exception ex)
             {
