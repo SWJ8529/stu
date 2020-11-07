@@ -175,6 +175,8 @@ namespace MyScreenPrint
                         byte[] picdata = ms.GetBuffer();//StreamToBytes(ms);
                                                         //BytesToImage(picdata);
                         string response = CreatePostData(ReadZB._URL, DateTime.Now.ToFileTime().ToString(), picdata);
+
+
                         PICResponse pir = JsonConvert.DeserializeObject<PICResponse>(response);
                         ms.Close();
                         g.Dispose();
@@ -358,6 +360,7 @@ namespace MyScreenPrint
             //post总长度
             long length = form_data.Length + fileStream.Length + foot_data.Length;
             req.ContentLength = length;
+            req.Proxy = null;//不使用代理提高执行效率
             Stream requestStream = req.GetRequestStream();
             //这里要注意一下发送顺序，先发送form_data > buffer > foot_data
             //发送表单参数
@@ -541,7 +544,7 @@ namespace MyScreenPrint
             setting.Visible = false;
             e.Cancel = true;
         }
-
+        
         private void backgroundWorker1_DoWork(object sender, System.ComponentModel.DoWorkEventArgs e)
         {
             while (true)
