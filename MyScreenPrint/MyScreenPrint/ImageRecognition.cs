@@ -21,104 +21,195 @@ namespace MyScreenPrint
         // 矩形宽高
         private int width;
         private int height;
-        [DllImport("gdi32.dll")]
-        private static extern IntPtr CreateDC(string lpszDriver, string lpszDevice, string lpszoutput, IntPtr lpdate);
-        [DllImport("gdi32.dll")]
-        private static extern BootMode BitBlt(IntPtr hdcDest, int x, int y, int widht, int hight, IntPtr hdcsrc, int xsrc, int ysrc, System.Int32 dw);
-        public string SaveImg(Boolean flag = false)
+        //[DllImport("gdi32.dll")]
+        //private static extern IntPtr CreateDC(string lpszDriver, string lpszDevice, string lpszoutput, IntPtr lpdate);
+        //[DllImport("gdi32.dll")]
+        //private static extern BootMode BitBlt(IntPtr hdcDest, int x, int y, int widht, int hight, IntPtr hdcsrc, int xsrc, int ysrc, System.Int32 dw);
+        //public string SaveImg(Boolean flag = false)
+        //{
+        //    string ret = string.Empty;
+        //    try
+        //    {
+        //        IntPtr dc1 = CreateDC("display", null, null, (IntPtr)null);
+        //        Graphics g1 = Graphics.FromHdc(dc1);
+        //        Bitmap my = new Bitmap(Screen.PrimaryScreen.Bounds.Width, Screen.PrimaryScreen.Bounds.Height, g1);
+        //        Graphics g2 = Graphics.FromImage(my);
+        //        IntPtr dc3 = g1.GetHdc();
+        //        IntPtr dc2 = g2.GetHdc();
+        //        BitBlt(dc2, 0, 0, Screen.PrimaryScreen.Bounds.Width, Screen.PrimaryScreen.Bounds.Height, dc3, 0, 0, 13369376);
+        //        g1.ReleaseHdc(dc3);
+        //        g2.ReleaseHdc(dc2);
+
+        //        int i = 0;
+
+        //        #region 获取坐标
+        //        if (ReadZB.point.Count > 0)
+        //        {
+        //            foreach (string line in ReadZB.point)
+        //            {
+
+        //                i++;
+        //                rectX = Convert.ToInt32(line.Split(',')[0]);
+        //                rectY = Convert.ToInt32(line.Split(',')[1]);
+        //                width = Convert.ToInt32(line.Split(',')[2]);
+        //                height = Convert.ToInt32(line.Split(',')[3]);
+
+        //                // 保存图片到图片框
+        //                Bitmap bmp = new Bitmap(width, height);
+        //                Graphics g = Graphics.FromImage(bmp);
+        //                g.DrawImage(my, new Rectangle(0, 0, width, height), new Rectangle(rectX, rectY, width, height), GraphicsUnit.Pixel);
+
+        //                if (flag)
+        //                {
+        //                    bmp.Save(Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "\\" + DateTime.Now.ToFileTime().ToString() + ".png");
+        //                }
+
+
+        //                MemoryStream ms = new MemoryStream();
+        //                bmp.Save(ms, ImageFormat.Png);
+        //                byte[] picdata = ms.GetBuffer();//StreamToBytes(ms);
+        //                                                //BytesToImage(picdata);
+        //                string response = CreatePostData(ReadZB._URL, DateTime.Now.ToFileTime().ToString(), picdata);
+
+
+        //                PICResponse pir = JsonConvert.DeserializeObject<PICResponse>(response);
+        //                ms.Close();
+        //                g.Dispose();
+        //                bmp.Dispose();
+        //                bmp =null;
+        //                try
+        //                {
+        //                    if (!string.IsNullOrEmpty(pir.data) && decimal.Parse(pir.data) != 0)//判断是否为空
+        //                    {
+        //                        ret = JsonConvert.SerializeObject(pir);
+        //                        break;//跳出循环
+
+
+        //                    }
+        //                    if (i == ReadZB.point.Count && string.IsNullOrEmpty(pir.data))//如果是最后一个坐标并且还没数据
+        //                    {
+        //                        ret = "{\"msg\":\"没获取到坐标中的数据!\",\"code\":500,\"data\":\"\"}";
+        //                    }
+        //                }
+        //                catch (Exception ex)
+        //                {
+        //                    Log.Save(ex.ToString());
+        //                    continue;//继续循环
+        //                }
+        //            }
+        //        }
+        //        else
+        //        {
+        //            ret = "{\"msg\":\"读取坐标失败!\",\"code\":500,\"data\":\"\"}";
+        //        }
+        //        if (string.IsNullOrEmpty(ret))
+        //        {
+        //            ret = "{\"msg\":\"未读取到数据!\",\"code\":500,\"data\":\"\"}";
+        //        }
+
+        //        g1.Dispose();
+        //        g2.Dispose();
+        //        my.Dispose();
+        //        my=null;
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        SystemMemeoryCleanup.ClearMemory();//清理缓存(类似360加速球的效果)
+        //        Log.Save(ex.ToString());
+        //    }
+        //    return ret;
+        //    #endregion
+        //}
+
+        public string SaveImgNew(Boolean flag = false)
         {
             string ret = string.Empty;
             try
             {
-                IntPtr dc1 = CreateDC("display", null, null, (IntPtr)null);
-                Graphics g1 = Graphics.FromHdc(dc1);
-                Bitmap my = new Bitmap(Screen.PrimaryScreen.Bounds.Width, Screen.PrimaryScreen.Bounds.Height, g1);
-                Graphics g2 = Graphics.FromImage(my);
-                IntPtr dc3 = g1.GetHdc();
-                IntPtr dc2 = g2.GetHdc();
-                BitBlt(dc2, 0, 0, Screen.PrimaryScreen.Bounds.Width, Screen.PrimaryScreen.Bounds.Height, dc3, 0, 0, 13369376);
-                g1.ReleaseHdc(dc3);
-                g2.ReleaseHdc(dc2);
-
-                int i = 0;
-
-                #region 获取坐标
-                if (ReadZB.point.Count > 0)
+                using (Bitmap myImage = new Bitmap(Screen.PrimaryScreen.Bounds.Width, Screen.PrimaryScreen.Bounds.Height))
                 {
-                    foreach (string line in ReadZB.point)
+                    Graphics g = Graphics.FromImage(myImage);
+
+                    g.CopyFromScreen(new Point(0, 0), new Point(0, 0), new Size(Screen.PrimaryScreen.Bounds.Width, Screen.PrimaryScreen.Bounds.Height));
+                    g.ReleaseHdc(g.GetHdc());
+                    g.Dispose();
+
+                    int i = 0;
+                    #region 获取坐标
+                    if (ReadZB.point.Count > 0)
                     {
-
-                        i++;
-                        rectX = Convert.ToInt32(line.Split(',')[0]);
-                        rectY = Convert.ToInt32(line.Split(',')[1]);
-                        width = Convert.ToInt32(line.Split(',')[2]);
-                        height = Convert.ToInt32(line.Split(',')[3]);
-
-                        // 保存图片到图片框
-                        Bitmap bmp = new Bitmap(width, height);
-                        Graphics g = Graphics.FromImage(bmp);
-                        g.DrawImage(my, new Rectangle(0, 0, width, height), new Rectangle(rectX, rectY, width, height), GraphicsUnit.Pixel);
-
-                        if (flag)
+                        foreach (string line in ReadZB.point)
                         {
-                            bmp.Save(Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "\\" + DateTime.Now.ToFileTime().ToString() + ".png");
-                        }
 
+                            i++;
+                            rectX = Convert.ToInt32(line.Split(',')[0]);
+                            rectY = Convert.ToInt32(line.Split(',')[1]);
+                            width = Convert.ToInt32(line.Split(',')[2]);
+                            height = Convert.ToInt32(line.Split(',')[3]);
 
-                        MemoryStream ms = new MemoryStream();
-                        bmp.Save(ms, ImageFormat.Png);
-                        byte[] picdata = ms.GetBuffer();//StreamToBytes(ms);
-                                                        //BytesToImage(picdata);
-                        string response = CreatePostData(ReadZB._URL, DateTime.Now.ToFileTime().ToString(), picdata);
+                            // 保存图片到图片框
+                            Bitmap bmp = new Bitmap(width, height);
+                            Graphics partPic = Graphics.FromImage(bmp);
+                            partPic.DrawImage(myImage, new Rectangle(0, 0, width, height), new Rectangle(rectX, rectY, width, height), GraphicsUnit.Pixel);
 
-
-                        PICResponse pir = JsonConvert.DeserializeObject<PICResponse>(response);
-                        ms.Close();
-                        g.Dispose();
-                        bmp.Dispose();
-                        bmp =null;
-                        try
-                        {
-                            if (!string.IsNullOrEmpty(pir.data) && decimal.Parse(pir.data) != 0)//判断是否为空
+                            if (flag)
                             {
-                                ret = JsonConvert.SerializeObject(pir);
-                                break;//跳出循环
-
-
+                                bmp.Save(Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "\\" + DateTime.Now.ToFileTime().ToString() + ".png");
                             }
-                            if (i == ReadZB.point.Count && string.IsNullOrEmpty(pir.data))//如果是最后一个坐标并且还没数据
+
+
+                            MemoryStream ms = new MemoryStream();
+                            bmp.Save(ms, ImageFormat.Png);
+                            byte[] picdata = ms.GetBuffer();//StreamToBytes(ms);
+                                                            //BytesToImage(picdata);
+                            string response = CreatePostData(ReadZB._URL, DateTime.Now.ToFileTime().ToString(), picdata);
+
+
+                            PICResponse pir = JsonConvert.DeserializeObject<PICResponse>(response);
+                            ms.Close();
+                            partPic.Dispose();
+                            bmp.Dispose();
+                            bmp = null;
+                            try
                             {
-                                ret = "{\"msg\":\"没获取到坐标中的数据!\",\"code\":500,\"data\":\"\"}";
+                                if (!string.IsNullOrEmpty(pir.data) && decimal.Parse(pir.data) != 0)//判断是否为空
+                                {
+                                    ret = JsonConvert.SerializeObject(pir);
+                                    break;//跳出循环
+
+
+                                }
+                                if (i == ReadZB.point.Count && string.IsNullOrEmpty(pir.data))//如果是最后一个坐标并且还没数据
+                                {
+                                    ret = "{\"msg\":\"没获取到坐标中的数据!\",\"code\":500,\"data\":\"\"}";
+                                }
                             }
-                        }
-                        catch (Exception ex)
-                        {
-                            Log.Save(ex.ToString());
-                            continue;//继续循环
+                            catch (Exception ex)
+                            {
+                                Log.Save(ex.ToString());
+                                continue;//继续循环
+                            }
                         }
                     }
+                    else
+                    {
+                        ret = "{\"msg\":\"读取坐标失败!\",\"code\":500,\"data\":\"\"}";
+                    }
+                    if (string.IsNullOrEmpty(ret))
+                    {
+                        ret = "{\"msg\":\"未读取到数据!\",\"code\":500,\"data\":\"\"}";
+                    }
                 }
-                else
-                {
-                    ret = "{\"msg\":\"读取坐标失败!\",\"code\":500,\"data\":\"\"}";
-                }
-                if (string.IsNullOrEmpty(ret))
-                {
-                    ret = "{\"msg\":\"未读取到数据!\",\"code\":500,\"data\":\"\"}";
-                }
-
-                g1.Dispose();
-                g2.Dispose();
-                my.Dispose();
-                my=null;
+                #endregion
             }
             catch (Exception ex)
             {
                 SystemMemeoryCleanup.ClearMemory();//清理缓存(类似360加速球的效果)
                 Log.Save(ex.ToString());
+                ret = "{\"msg\":\"出现异常，请联系管理员!\",\"code\":500,\"data\":\"\"}";
             }
             return ret;
-            #endregion
+            
         }
 
         public string CreatePostData(string url, string filename, byte[] data)

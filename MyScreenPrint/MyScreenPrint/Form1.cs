@@ -129,7 +129,7 @@ namespace MyScreenPrint
         private void changeLabelText(bool flag)
         {
             FloatLabel.BeginInvoke(new Action(() => {
-                PICResponse response = JsonConvert.DeserializeObject<PICResponse>(image_ecognition.SaveImg(flag));
+                PICResponse response = JsonConvert.DeserializeObject<PICResponse>(image_ecognition.SaveImgNew(flag));
                 if (string.IsNullOrEmpty(response.data)) 
                 {
                     FloatLabel.Text = "金额:0";
@@ -184,6 +184,7 @@ namespace MyScreenPrint
             {
                 //生成图片
                 changeLabelText(true);
+                //image_ecognition.SaveImgNew(true);
             }
             else
             {
