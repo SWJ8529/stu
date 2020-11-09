@@ -31,9 +31,7 @@ namespace MyScreenPrint
                     //1.2 已经有一个实例在运行
                     HandleRunningInstance(instance);
                     return;
-                }
-                ReadZB zb = new ReadZB();
-                zb.readpoint();
+                }             
                 Application.EnableVisualStyles();
                 Application.SetCompatibleTextRenderingDefault(false);
 

@@ -14,31 +14,26 @@ namespace MyScreenPrint
 {
     public partial class Form1 : Form
     {
-        public Label FloatLabel = new Label();//创建悬浮窗上的文本
-
+        // 加载截图和图片识别类
+        ImageRecognition image_ecognition = new ImageRecognition();
+        // 创建悬浮窗上的文本
+        Label FloatLabel = new Label();
+        // 创建悬浮窗
         Form floatFormNew = new Form();
-
-        //FloatForm floatForm = new FloatForm();//创建悬浮窗
-
-        CheckBox isStartUp = new CheckBox();//创建开机启动按钮
-
-        CheckBox isStartService = new CheckBox();//创建是否开机启动服务按钮
-
-        Form setting = new Form();//更多设置窗体
-
-
+        // 创建是否开机启动按钮
+        CheckBox isStartUp = new CheckBox();
+        // 创建是否开机启动识别服务按钮
+        CheckBox isStartService = new CheckBox();
+        // 更多设置窗体
+        Form setting = new Form();
+        // 读取app.config配置文件
         Configuration config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
-        static String Interval;//定时时间
+        // 定时时间
+        static String Interval;
         // 截图窗口
         Cutter cutter = null;
-
-        // 截得的图片
-        public static Bitmap catchBmp = null;
-
         // 绘图参数
-        enum Tools { Pen, Text};
-        Graphics catchBmpGraphics = null;  // 图形设备
-        Color color = Color.White;  // 选择的颜色
+        enum Tools { Pen, Text };
 
         public Form1()
         {
@@ -52,197 +47,27 @@ namespace MyScreenPrint
             this.UpdateStyles();
         }
 
-        #region 按钮事件
-      
-        // 点击按钮开始捕捉屏幕
-        private void printScrBtn_Click(object sender, EventArgs e)
+        protected override CreateParams CreateParams
         {
-
-            // 新建一个截图窗口
-            cutter = new Cutter();
-
-            // 隐藏原窗口
-            Hide();
-            Thread.Sleep(200);
-
-            // 设置截图窗口的背景图片
-            Bitmap bmp = new Bitmap(Screen.AllScreens[0].Bounds.Width, Screen.AllScreens[0].Bounds.Height);
-            Graphics g = Graphics.FromImage(bmp);
-            g.CopyFromScreen(new Point(0, 0), new Point(0, 0), new Size(bmp.Width, bmp.Height));
-            cutter.BackgroundImage = bmp;
-
-            // 显示原窗口
-            Show();
-
-            // 显示截图窗口
-            cutter.WindowState = FormWindowState.Maximized;
-            cutter.ShowDialog();
-            textBox1.Text = "";
-            foreach (string p in ReadZB.point)
+            get
             {
-                textBox1.Text += p+"\r\n";
+                CreateParams cp = base.CreateParams;
+                cp.ExStyle |= 0x02000000; // 用双缓冲绘制窗口的所有子控件
+                return cp;
             }
-            
-            label1.Text = "设置坐标个数:" + ReadZB.point.Count;
-            // 显示所截得的图片
-            //UpdateScreen();
-
-            // 获取截图图片的图形设备
-            //catchBmpGraphics = Graphics.FromImage(catchBmp);
-        }
-        #endregion
-
-        private void button2_Click(object sender, EventArgs e)
-        {
-            DialogResult dr= MessageBox.Show("这是测试按钮！点击后会根据坐标截取指定区域的图片，文件将生成在桌面上。","提示",MessageBoxButtons.YesNo);
-            
-            Hide();
-            Thread.Sleep(200);
-            if (dr == DialogResult.Yes)
-            {
-                SaveImg(true);
-            }
-            else
-            {
-                SaveImg(false);
-            }
-
-            Show();
-            MessageBox.Show("识别成功！");
         }
 
-
-        // 矩形起点
-        private int rectX;
-        private int rectY;
-        // 矩形宽高
-        private int width;
-        private int height;
-        [DllImport("gdi32.dll")]
-        public static extern IntPtr CreateDC(string lpszDriver, string lpszDevice, string lpszoutput, IntPtr lpdate);
-        [DllImport("gdi32.dll")]
-        public static extern BootMode BitBlt(IntPtr hdcDest, int x, int y, int widht, int hight, IntPtr hdcsrc, int xsrc, int ysrc, System.Int32 dw);
-        //声明一个委托对象
-        public delegate void Action2<in T>(T t);
-
-        public void changeLabelText(string text)
-        {
-            FloatLabel.Text = "金额:" + text;
-        }
-        public string SaveImg(Boolean flag=false)
-        {
-            Action2<string> action2 = new Action2<string>(changeLabelText);
-            string ret = string.Empty;
-            try
-            {      
-                IntPtr dc1 = CreateDC("display", null, null, (IntPtr)null);
-                Graphics g1 = Graphics.FromHdc(dc1);
-                Bitmap my = new Bitmap(Screen.PrimaryScreen.Bounds.Width, Screen.PrimaryScreen.Bounds.Height, g1);
-                Graphics g2 = Graphics.FromImage(my);
-                IntPtr dc3 = g1.GetHdc();
-                IntPtr dc2 = g2.GetHdc();
-                BitBlt(dc2, 0, 0, Screen.PrimaryScreen.Bounds.Width, Screen.PrimaryScreen.Bounds.Height, dc3, 0, 0, 13369376);
-                g1.ReleaseHdc(dc3);
-                g2.ReleaseHdc(dc2);
-
-                int i = 0;
-
-                #region 获取坐标
-                if (ReadZB.point.Count > 0)
-                {
-                    foreach (string line in ReadZB.point)
-                    {
-                        
-                        i++;
-                        rectX = Convert.ToInt32(line.Split(',')[0]);
-                        rectY = Convert.ToInt32(line.Split(',')[1]);
-                        width = Convert.ToInt32(line.Split(',')[2]);
-                        height = Convert.ToInt32(line.Split(',')[3]);
-
-                        // 保存图片到图片框
-                        Bitmap bmp = new Bitmap(width, height);
-                        Graphics g = Graphics.FromImage(bmp);
-                        g.DrawImage(my, new Rectangle(0, 0, width, height), new Rectangle(rectX, rectY, width, height), GraphicsUnit.Pixel);
-
-                        if (flag)
-                        {
-                            bmp.Save(Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "\\" + DateTime.Now.ToFileTime().ToString() + ".png");
-                        }
-
-
-                        MemoryStream ms = new MemoryStream();
-                        bmp.Save(ms, ImageFormat.Png);
-                        byte[] picdata = ms.GetBuffer();//StreamToBytes(ms);
-                                                        //BytesToImage(picdata);
-                        string response = CreatePostData(ReadZB._URL, DateTime.Now.ToFileTime().ToString(), picdata);
-
-
-                        PICResponse pir = JsonConvert.DeserializeObject<PICResponse>(response);
-                        ms.Close();
-                        g.Dispose();
-                        bmp.Dispose();
-                        try
-                        {
-                            if (!string.IsNullOrEmpty(pir.data) && decimal.Parse(pir.data) != 0)//判断是否为空
-                            {
-                                ret = JsonConvert.SerializeObject(pir);
-                                Invoke(action2, pir.data);
-                                //FloatLabel.Text = "金额:" + pir.data;
-                                break;//跳出循环
-
-
-                            }
-                            if (i == ReadZB.point.Count && string.IsNullOrEmpty(pir.data))//如果是最后一个坐标并且还没数据
-                            {
-                                //floatForm.FloatLabel.Text = "金额:0";
-                                //FloatLabel.Text = "金额:0";
-                                Invoke(action2, "0");
-                            }
-                        }
-                        catch (Exception ex)
-                        {
-                            Log.Save(ex.ToString());
-                            continue;//继续循环
-                        }
-                    }
-                }
-                else
-                {
-                    //取消执行
-                    backgroundWorker1.WorkerSupportsCancellation = true;
-                    backgroundWorker1.CancelAsync();
-                    timebtn.Text = "启动";
-                    MessageBox.Show("请设置坐标！", "提示");
-                    //FloatLabel.Text = "金额:0";
-                    Invoke(action2, "0");
-                    ret = "{\"msg\":\"读取坐标失败!\",\"code\":500,\"data\":\"\"}";
-                }
-                if (string.IsNullOrEmpty(ret))
-                {
-                    ret = "{\"msg\":\"未读取到数据!\",\"code\":500,\"data\":\"\"}";
-                }
-
-                g1.Dispose();
-                g2.Dispose();
-                my.Dispose();
-                GC.Collect();
-                //SystemMemeoryCleanup.ClearMemory();//清理缓存(类似360加速球的效果)
-            }
-            catch(Exception ex)
-            {
-                //如果出现异常清除缓存重新开始
-                GC.Collect();
-                SystemMemeoryCleanup.ClearMemory();//清理缓存(类似360加速球的效果)
-                Log.Save(ex.ToString());
-            }
-            return ret;
-            #endregion
-        }
-
-
+        /// <summary>
+        /// 初始化事件
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void Form1_Load(object sender, EventArgs e)
         {
-            
+            //初始化坐标数据
+            ReadZB zb = new ReadZB();
+            zb.readpoint();
+
             label1.Text = "设置坐标个数:" + ReadZB.point.Count;
             Interval = ConfigurationManager.AppSettings["Time"];
             timetext.Text = Interval;
@@ -250,24 +75,25 @@ namespace MyScreenPrint
             {
                 foreach (string line in ReadZB.point)
                 {
-                    textBox1.Text += line+"\r\n";
+                    textBox1.Text += line + "\r\n";
                 }
             }
 
-            
-            floatFormNew.TopMost = true;//设置窗口永远为屏幕前面
-            floatFormNew.ShowInTaskbar = false;//不在任务栏中显示以免误关
+
+            floatFormNew.TopMost = true;// 设置窗口永远为屏幕前面
+            floatFormNew.ShowInTaskbar = false;// 不在任务栏中显示以免误关
+
             floatFormNew.Width = 150;
             floatFormNew.Height = 40;
 
             floatFormNew.MaximizeBox = false;
             floatFormNew.MinimizeBox = false;
+
             int x = (SystemInformation.WorkingArea.Width - floatFormNew.Size.Width) / 2;
             int y = (SystemInformation.WorkingArea.Height - floatFormNew.Size.Height) / 2;
-            floatFormNew.StartPosition = FormStartPosition.Manual; //窗体的位置由Location属性决定
-            floatFormNew.Location = (Point)new Size(x, 0);         //窗体的起始位置为(x,y)
 
-
+            floatFormNew.StartPosition = FormStartPosition.Manual; // 窗体的位置由Location属性决定
+            floatFormNew.Location = (Point)new Size(x, 0);         // 窗体的起始位置为(x,y)
 
             FloatLabel.Location = new Point(0, 10);
             FloatLabel.AutoSize = true;
@@ -296,6 +122,85 @@ namespace MyScreenPrint
             }
         }
 
+        /// <summary>
+        /// 截图和识别功能
+        /// </summary>
+        /// <param name="flag">true根据坐标截图到桌面，false不生成</param>
+        private void changeLabelText(bool flag)
+        {
+            FloatLabel.BeginInvoke(new Action(() => {
+                PICResponse response = JsonConvert.DeserializeObject<PICResponse>(image_ecognition.SaveImg(flag));
+                if (string.IsNullOrEmpty(response.data)) 
+                {
+                    FloatLabel.Text = "金额:0";
+                }
+                else
+                {
+                    FloatLabel.Text = "金额:"+ response.data;
+                }
+            }));
+        }
+
+
+
+        #region 按钮事件
+
+        // 点击按钮开始捕捉屏幕
+        private void printScrBtn_Click(object sender, EventArgs e)
+        {
+            // 新建一个截图窗口
+            cutter = new Cutter();
+            // 隐藏原窗口
+            Hide();
+            Thread.Sleep(200);
+
+            // 设置截图窗口的背景图片
+            Bitmap bmp = new Bitmap(Screen.AllScreens[0].Bounds.Width, Screen.AllScreens[0].Bounds.Height);
+            Graphics g = Graphics.FromImage(bmp);
+            g.CopyFromScreen(new Point(0, 0), new Point(0, 0), new Size(bmp.Width, bmp.Height));
+            cutter.BackgroundImage = bmp;
+            // 显示原窗口
+            Show();
+            // 显示截图窗口
+            cutter.WindowState = FormWindowState.Maximized;
+            cutter.ShowDialog();
+            textBox1.Text = "";
+            foreach (string p in ReadZB.point)
+            {
+                textBox1.Text += p+"\r\n";
+            }
+            
+            label1.Text = "设置坐标个数:" + ReadZB.point.Count;
+        }
+        #endregion
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            DialogResult dr= MessageBox.Show("这是测试按钮！点击后会根据坐标截取指定区域的图片，文件将生成在桌面上。","提示",MessageBoxButtons.YesNo);
+            // 隐藏当前窗口防止需要识别的内容被遮挡
+            Hide();
+            Thread.Sleep(200);
+            if (dr == DialogResult.Yes)
+            {
+                //生成图片
+                changeLabelText(true);
+            }
+            else
+            {
+                changeLabelText(false);
+            }
+            Show();
+            MessageBox.Show("识别成功！");
+        }
+
+
+
+
+        
+
+
+
+
         private void Clean_Point_Click(object sender, EventArgs e)
         {
             FileStream fs = new FileStream(ReadZB.FilePath, FileMode.Open, FileAccess.Write);
@@ -313,84 +218,6 @@ namespace MyScreenPrint
             MessageBox.Show("已清空！");
         }
 
-        public byte[] StreamToBytes(Stream stream)
-        {
-            byte[] bytes = new byte[stream.Length];
-            stream.Read(bytes, 0, bytes.Length);
-            // 设置当前流的位置为流的开始
-            stream.Seek(0, SeekOrigin.Begin);
-            return bytes;
-        }
-
-        /// <summary>
-        /// Convert Byte[] to Image
-        /// </summary>
-        /// <param name="buffer"></param>
-        /// <returns></returns>
-        public static Image BytesToImage(byte[] buffer)
-        {
-            MemoryStream ms = new MemoryStream(buffer);
-            Image image = System.Drawing.Image.FromStream(ms);
-            return image;
-        }
-        public string CreatePostData(string url, string filename, byte[] data)
-        {
-
-            Stream fileStream = new MemoryStream(data);
-
-            BinaryReader br = new BinaryReader(fileStream);
-
-            byte[] buffer = br.ReadBytes(Convert.ToInt32(fileStream.Length));
-            string boundary = "---------------------------" + DateTime.Now.Ticks.ToString("x");
-            //请求
-            WebRequest req = WebRequest.Create(url);
-            req.Method = "POST";
-            req.ContentType = "multipart/form-data; boundary=" + boundary;
-            //组织表单数据
-            StringBuilder sb = new StringBuilder();
-            sb.Append("--" + boundary + "\r\n");
-            sb.Append("Content-Disposition: form-data; name=\"file\"; filename=\"" + filename + "\";");
-            sb.Append("\r\n");
-            sb.Append("Content-Type: image/png");
-            sb.Append("\r\n\r\n");
-            string head = sb.ToString();
-            byte[] form_data = Encoding.UTF8.GetBytes(head);
-            //结尾
-            byte[] foot_data = Encoding.UTF8.GetBytes("\r\n--" + boundary + "--\r\n");
-            //post总长度
-            long length = form_data.Length + fileStream.Length + foot_data.Length;
-            req.ContentLength = length;
-            req.Proxy = null;//不使用代理提高执行效率
-            Stream requestStream = req.GetRequestStream();
-            //这里要注意一下发送顺序，先发送form_data > buffer > foot_data
-            //发送表单参数
-            requestStream.Write(form_data, 0, form_data.Length);
-            //发送文件内容
-            requestStream.Write(buffer, 0, buffer.Length);
-            //结尾
-            requestStream.Write(foot_data, 0, foot_data.Length);
-            requestStream.Close();
-            fileStream.Close();
-            fileStream.Dispose();
-            br.Close();
-            // br.Dispose();
-            //响应
-            WebResponse pos = req.GetResponse();
-            StreamReader sr = new StreamReader(pos.GetResponseStream(), Encoding.UTF8);
-            string html = sr.ReadToEnd().Trim();
-            sr.Close();
-            sr.Dispose();
-            if (pos != null)
-            {
-                pos.Close();
-                pos = null;
-            }
-            if (req != null)
-            {
-                req = null;
-            }
-            return html;
-        }
         private void timebtn_Click(object sender, EventArgs e)
         {
             //更新定时时间
@@ -555,7 +382,8 @@ namespace MyScreenPrint
                     return;
                 }
                 Thread.Sleep(int.Parse(Interval));
-                SaveImg(false);
+                changeLabelText(false);
+                GC.Collect();
             }
         }
     }

@@ -79,7 +79,6 @@ C:\Users\Administrator\Source\Repos\stu\MyScreenPrint\MyScreenPrint\bin\Debug\Ne
 C:\Users\Administrator\Source\Repos\stu\MyScreenPrint\MyScreenPrint\obj\Debug\Interop.IWshRuntimeLibrary.dll
 C:\Users\Administrator\Source\Repos\stu\MyScreenPrint\MyScreenPrint\obj\Debug\MyScreenPrint.csproj.ResolveComReference.cache
 C:\Users\Administrator\Source\Repos\stu\MyScreenPrint\MyScreenPrint\obj\Debug\MyScreenPrint.Cutter.resources
-C:\Users\Administrator\Source\Repos\stu\MyScreenPrint\MyScreenPrint\obj\Debug\MyScreenPrint.FloatForm.resources
 C:\Users\Administrator\Source\Repos\stu\MyScreenPrint\MyScreenPrint\obj\Debug\MyScreenPrint.Form1.resources
 C:\Users\Administrator\Source\Repos\stu\MyScreenPrint\MyScreenPrint\obj\Debug\MyScreenPrint.Properties.Resources.resources
 C:\Users\Administrator\Source\Repos\stu\MyScreenPrint\MyScreenPrint\obj\Debug\MyScreenPrint.csproj.GenerateResource.cache
