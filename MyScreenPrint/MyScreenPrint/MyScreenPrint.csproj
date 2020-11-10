@@ -87,6 +87,12 @@
     <Compile Include="Cutter.cs">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="FloatForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FloatForm.Designer.cs">
+      <DependentUpon>FloatForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="Form1.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -102,6 +108,9 @@
     <Compile Include="SystemMemeoryCleanup.cs" />
     <EmbeddedResource Include="Cutter.resx">
       <DependentUpon>Cutter.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FloatForm.resx">
+      <DependentUpon>FloatForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>

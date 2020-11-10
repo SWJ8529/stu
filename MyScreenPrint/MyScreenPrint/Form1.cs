@@ -16,10 +16,10 @@ namespace MyScreenPrint
     {
         // 加载截图和图片识别类
         ImageRecognition image_ecognition = new ImageRecognition();
-        // 创建悬浮窗上的文本
-        Label FloatLabel = new Label();
+        //// 创建悬浮窗上的文本
+        //Label FloatLabel = new Label();
         // 创建悬浮窗
-        Form floatFormNew = new Form();
+        FloatForm floatFormNew = new FloatForm();
         // 创建是否开机启动按钮
         CheckBox isStartUp = new CheckBox();
         // 创建是否开机启动识别服务按钮
@@ -38,8 +38,6 @@ namespace MyScreenPrint
         public Form1()
         {
             InitializeComponent();
-            floatFormNew.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
-            floatFormNew.BackColor = Color.LightGoldenrodYellow;
             // 双缓冲
             this.SetStyle(ControlStyles.DoubleBuffer | ControlStyles.UserPaint |
                            ControlStyles.AllPaintingInWmPaint,
@@ -80,29 +78,6 @@ namespace MyScreenPrint
             }
 
 
-            floatFormNew.TopMost = true;// 设置窗口永远为屏幕前面
-            floatFormNew.ShowInTaskbar = false;// 不在任务栏中显示以免误关
-
-            floatFormNew.Width = 150;
-            floatFormNew.Height = 40;
-
-            floatFormNew.MaximizeBox = false;
-            floatFormNew.MinimizeBox = false;
-
-            int x = (SystemInformation.WorkingArea.Width - floatFormNew.Size.Width) / 2;
-            int y = (SystemInformation.WorkingArea.Height - floatFormNew.Size.Height) / 2;
-
-            floatFormNew.StartPosition = FormStartPosition.Manual; // 窗体的位置由Location属性决定
-            floatFormNew.Location = (Point)new Size(x, 0);         // 窗体的起始位置为(x,y)
-
-            FloatLabel.Location = new Point(0, 10);
-            FloatLabel.AutoSize = true;
-            FloatLabel.Font = new Font(floatFormNew.Font.FontFamily, 13);
-
-            FloatLabel.Text = "金额:0";
-            floatFormNew.Controls.Add(FloatLabel);
-
-
             floatFormNew.Show();
             //floatForm.Show();
 
@@ -128,15 +103,15 @@ namespace MyScreenPrint
         /// <param name="flag">true根据坐标截图到桌面，false不生成</param>
         private void changeLabelText(bool flag)
         {
-            FloatLabel.BeginInvoke(new Action(() => {
+            floatFormNew.FloatLabel.BeginInvoke(new Action(() => {
                 PICResponse response = JsonConvert.DeserializeObject<PICResponse>(image_ecognition.SaveImgNew(flag));
                 if (string.IsNullOrEmpty(response.data)) 
                 {
-                    FloatLabel.Text = "金额:0";
+                    floatFormNew.FloatLabel.Text = "金额:0";
                 }
                 else
                 {
-                    FloatLabel.Text = "金额:"+ response.data;
+                    floatFormNew.FloatLabel.Text = "金额:"+ response.data;
                 }
             }));
         }

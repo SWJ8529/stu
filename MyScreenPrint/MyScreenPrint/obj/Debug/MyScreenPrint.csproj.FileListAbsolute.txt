@@ -85,3 +85,4 @@ C:\Users\Administrator\Source\Repos\stu\MyScreenPrint\MyScreenPrint\obj\Debug\My
 C:\Users\Administrator\Source\Repos\stu\MyScreenPrint\MyScreenPrint\obj\Debug\MyScreenPrint.csproj.CopyComplete
 C:\Users\Administrator\Source\Repos\stu\MyScreenPrint\MyScreenPrint\obj\Debug\图片识别插件.exe
 C:\Users\Administrator\Source\Repos\stu\MyScreenPrint\MyScreenPrint\obj\Debug\图片识别插件.pdb
+C:\Users\Administrator\Source\Repos\stu\MyScreenPrint\MyScreenPrint\obj\Debug\MyScreenPrint.FloatForm.resources
