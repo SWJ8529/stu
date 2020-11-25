@@ -16,7 +16,7 @@ namespace MyScreenPrint
     {
         // 加载截图和图片识别类
         ImageRecognition image_ecognition = new ImageRecognition();
-        //// 创建悬浮窗上的文本
+        // 创建悬浮窗上的文本
         //Label FloatLabel = new Label();
         // 创建悬浮窗
         FloatForm floatFormNew = new FloatForm();
@@ -62,7 +62,7 @@ namespace MyScreenPrint
         /// <param name="e"></param>
         private void Form1_Load(object sender, EventArgs e)
         {
-            //初始化坐标数据
+            // 初始化坐标数据
             ReadZB zb = new ReadZB();
             zb.readpoint();
 
@@ -79,7 +79,6 @@ namespace MyScreenPrint
 
 
             floatFormNew.Show();
-            //floatForm.Show();
 
             bool isStartService = bool.Parse(config.AppSettings.Settings["isStartService"].Value);
             if (isStartService)
@@ -104,7 +103,15 @@ namespace MyScreenPrint
         private void changeLabelText(bool flag)
         {
             floatFormNew.FloatLabel.BeginInvoke(new Action(() => {
-                PICResponse response = JsonConvert.DeserializeObject<PICResponse>(image_ecognition.SaveImgNew(flag));
+                PICResponse response = JsonConvert.DeserializeObject<PICResponse>(image_ecognition.SaveImg(flag));
+                if (response.msg== "读取坐标失败!")
+                {
+                    MessageBox.Show("请设置坐标！");
+                    //取消执行
+                    backgroundWorker1.WorkerSupportsCancellation = true;
+                    backgroundWorker1.CancelAsync();
+                    timebtn.Text = "启动";
+                }
                 if (string.IsNullOrEmpty(response.data)) 
                 {
                     floatFormNew.FloatLabel.Text = "金额:0";
@@ -168,14 +175,6 @@ namespace MyScreenPrint
             Show();
             MessageBox.Show("识别成功！");
         }
-
-
-
-
-        
-
-
-
 
         private void Clean_Point_Click(object sender, EventArgs e)
         {
@@ -262,6 +261,8 @@ namespace MyScreenPrint
                 // 关闭所有的线程
                 this.Dispose();
                 this.Close();
+                floatFormNew.Dispose();
+                floatFormNew.Close();
             }
             else
             {
@@ -281,6 +282,8 @@ namespace MyScreenPrint
                 // 关闭所有的线程
                 this.Dispose();
                 this.Close();
+                floatFormNew.Dispose();
+                floatFormNew.Close();
             }
         }
 
@@ -293,11 +296,11 @@ namespace MyScreenPrint
             setting.Width = 250;
             setting.Text = "更多设置";
             
-            isStartUp.CheckedChanged += isStartUp_CheckedChanged;
-            isStartUp.Checked = bool.Parse(config.AppSettings.Settings["isStartUp"].Value);
-            isStartUp.Text = "开机启动";
-            isStartUp.Location = new Point(50, 20);
-            setting.Controls.Add(isStartUp);
+            //isStartUp.CheckedChanged += isStartUp_CheckedChanged;
+            //isStartUp.Checked = bool.Parse(config.AppSettings.Settings["isStartUp"].Value);
+            //isStartUp.Text = "开机启动";
+            //isStartUp.Location = new Point(50, 20);
+            //setting.Controls.Add(isStartUp);
 
 
             isStartService.CheckedChanged += isStartService_CheckedChanged;
@@ -306,27 +309,28 @@ namespace MyScreenPrint
             isStartService.AutoSize=true;
             isStartService.Location = new Point(50, 60);
             setting.Controls.Add(isStartService);
-            setting.Show();
+            setting.StartPosition = FormStartPosition.CenterParent;
+            setting.ShowDialog();
         }
 
-        private void isStartUp_CheckedChanged(object sender, EventArgs e)
-        {
-            if (isStartUp.Checked)
-            {
-                config.AppSettings.Settings["isStartUp"].Value = "true";
+        //private void isStartUp_CheckedChanged(object sender, EventArgs e)
+        //{
+        //    if (isStartUp.Checked)
+        //    {
+        //        config.AppSettings.Settings["isStartUp"].Value = "true";
                 
-                RootClass.ShortcutAndStartup(true);//开启开机启动
-            }
-            else
-            {
-                config.AppSettings.Settings["isStartUp"].Value = "false";
-                config.AppSettings.Settings["isStartService"].Value = "false";
-                isStartService.Checked = false;
-                RootClass.ShortcutAndStartup(false);//关闭开机启动
+        //        RootClass.ShortcutAndStartup(true);//开启开机启动
+        //    }
+        //    else
+        //    {
+        //        config.AppSettings.Settings["isStartUp"].Value = "false";
+        //        config.AppSettings.Settings["isStartService"].Value = "false";
+        //        isStartService.Checked = false;
+        //        RootClass.ShortcutAndStartup(false);//关闭开机启动
 
-            }
-            config.Save(ConfigurationSaveMode.Modified);
-        }
+        //    }
+        //    config.Save(ConfigurationSaveMode.Modified);
+        //}
 
         private void isStartService_CheckedChanged(object sender, EventArgs e)
         {

@@ -17,7 +17,7 @@ namespace MyScreenPrint
         public string cs;
         public void readpoint()
         {
-            FilePath = Environment.CurrentDirectory.Substring(0, Environment.CurrentDirectory.IndexOf('\\')) + @"/Point.txt";
+            FilePath = Environment.CurrentDirectory + @"/Point.txt";
             #region 读取文件坐标
             if (!File.Exists(FilePath))//判断文件是否存在
             {
