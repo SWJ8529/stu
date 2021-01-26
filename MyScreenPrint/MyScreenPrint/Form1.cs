@@ -14,6 +14,7 @@ namespace MyScreenPrint
 {
     public partial class Form1 : Form
     {
+        System.Threading.Timer timer;
         // 加载截图和图片识别类
         ImageRecognition image_ecognition = new ImageRecognition();
         // 创建悬浮窗上的文本
@@ -86,12 +87,7 @@ namespace MyScreenPrint
                 //最小化窗口
                 WindowState = FormWindowState.Minimized;
                 Thread.Sleep(200);
-                //防止重复执行
-                if (backgroundWorker1.IsBusy)
-                {
-                    return;
-                }
-                backgroundWorker1.RunWorkerAsync();
+                timer = new System.Threading.Timer(new TimerCallback(timer_Elapsed), this, 0, Convert.ToInt32(Interval));
                 timebtn.Text = "停止";
             }
         }
@@ -102,16 +98,15 @@ namespace MyScreenPrint
         /// <param name="flag">true根据坐标截图到桌面，false不生成</param>
         private void changeLabelText(bool flag)
         {
-            floatFormNew.FloatLabel.BeginInvoke(new Action(() => {
-                PICResponse response = JsonConvert.DeserializeObject<PICResponse>(image_ecognition.SaveImg(flag));
-                if (response.msg== "读取坐标失败!")
-                {
-                    MessageBox.Show("请设置坐标！");
-                    //取消执行
-                    backgroundWorker1.WorkerSupportsCancellation = true;
-                    backgroundWorker1.CancelAsync();
-                    timebtn.Text = "启动";
-                }
+            PICResponse response = JsonConvert.DeserializeObject<PICResponse>(image_ecognition.SaveImg(flag));
+            if (response.msg == "读取坐标失败!")
+            {
+                MessageBox.Show("请设置坐标！");
+                //取消执行
+                timer.Dispose();
+                timebtn.Text = "启动";
+            }
+            floatFormNew.FloatLabel.BeginInvoke(new Action(() => {              
                 if (string.IsNullOrEmpty(response.data)) 
                 {
                     floatFormNew.FloatLabel.Text = "金额:0";
@@ -120,8 +115,13 @@ namespace MyScreenPrint
                 {
                     floatFormNew.FloatLabel.Text = "金额:"+ response.data;
                 }
-            }));
+            }),null);
         }
+        void timer_Elapsed(object state)
+        {
+            changeLabelText(false);
+        }
+
 
 
 
@@ -207,19 +207,15 @@ namespace MyScreenPrint
             {
                 //最小化窗口
                 WindowState = FormWindowState.Minimized;
-                //防止重复执行
-                if (backgroundWorker1.IsBusy)
-                {
-                    return;
-                }
-                backgroundWorker1.RunWorkerAsync();
+                timer = new System.Threading.Timer(new TimerCallback(timer_Elapsed), this, 0, Convert.ToInt32(Interval));
                 timebtn.Text = "停止";
             }
             else
             {
                 //取消执行
-                backgroundWorker1.WorkerSupportsCancellation = true;
-                backgroundWorker1.CancelAsync();
+                timer.Dispose();
+                //backgroundWorker1.WorkerSupportsCancellation = true;
+                //backgroundWorker1.CancelAsync();
                 timebtn.Text = "启动";
             }
             return;
@@ -351,21 +347,7 @@ namespace MyScreenPrint
             setting.Visible = false;
             e.Cancel = true;
         }
-        
-        private void backgroundWorker1_DoWork(object sender, System.ComponentModel.DoWorkEventArgs e)
-        {
-            while (true)
-            {
-                // 判断是否执行取消操作
-                if (backgroundWorker1.CancellationPending)
-                {
-                    return;
-                }
-                Thread.Sleep(int.Parse(Interval));
-                changeLabelText(false);
-                GC.Collect();
-            }
-        }
+       
     }
 
     public class PICResponse
