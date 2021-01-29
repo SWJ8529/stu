@@ -100,6 +100,7 @@ F:\ProjectCode\C#\stu\MyScreenPrint\MyScreenPrint\obj\Debug\MyScreenPrint.csproj
 F:\ProjectCode\C#\stu\MyScreenPrint\MyScreenPrint\obj\Debug\MyScreenPrint.csproj.CopyComplete
 F:\ProjectCode\C#\stu\MyScreenPrint\MyScreenPrint\bin\Debug\MyScreenPrint.pdb
 F:\ProjectCode\C#\stu\MyScreenPrint\MyScreenPrint\obj\Debug\MyScreenPrint.pdb
-F:\ProjectCode\C#\stu\MyScreenPrint\MyScreenPrint\bin\Debug\MyScreenPrint.dll.config
-F:\ProjectCode\C#\stu\MyScreenPrint\MyScreenPrint\bin\Debug\MyScreenPrint.dll
-F:\ProjectCode\C#\stu\MyScreenPrint\MyScreenPrint\obj\Debug\MyScreenPrint.dll
+F:\ProjectCode\C#\stu\MyScreenPrint\MyScreenPrint\obj\Debug\MyScreenPrint.csprojAssemblyReference.cache
+F:\ProjectCode\C#\stu\MyScreenPrint\MyScreenPrint\bin\Debug\MyScreenPrint.exe.config
+F:\ProjectCode\C#\stu\MyScreenPrint\MyScreenPrint\bin\Debug\MyScreenPrint.exe
+F:\ProjectCode\C#\stu\MyScreenPrint\MyScreenPrint\obj\Debug\MyScreenPrint.exe

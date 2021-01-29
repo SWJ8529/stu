@@ -106,16 +106,20 @@ namespace MyScreenPrint
                 timer.Dispose();
                 timebtn.Text = "启动";
             }
-            floatFormNew.FloatLabel.BeginInvoke(new Action(() => {              
-                if (string.IsNullOrEmpty(response.data)) 
+            if (this.IsHandleCreated)
+            {
+                floatFormNew.FloatLabel.BeginInvoke(new Action(() =>
                 {
-                    floatFormNew.FloatLabel.Text = "金额:0";
-                }
-                else
-                {
-                    floatFormNew.FloatLabel.Text = "金额:"+ response.data;
-                }
-            }),null);
+                    if (string.IsNullOrEmpty(response.data))
+                    {
+                        floatFormNew.FloatLabel.Text = "金额:0";
+                    }
+                    else
+                    {
+                        floatFormNew.FloatLabel.Text = "金额:" + response.data;
+                    }
+                }), null);
+            }
         }
         void timer_Elapsed(object state)
         {
